@@ -1,0 +1,723 @@
+   1              		.cpu cortex-m23
+   2              		.eabi_attribute 20, 1
+   3              		.eabi_attribute 21, 1
+   4              		.eabi_attribute 23, 3
+   5              		.eabi_attribute 24, 1
+   6              		.eabi_attribute 25, 1
+   7              		.eabi_attribute 26, 1
+   8              		.eabi_attribute 30, 6
+   9              		.eabi_attribute 34, 0
+  10              		.eabi_attribute 18, 4
+  11              		.file	"SecureAttrib.c"
+  12              		.text
+  13              	.Ltext0:
+  14              		.cfi_sections	.debug_frame
+  15              		.global	idau_ref
+  16              		.section	.bss.idau_ref,"aw",%nobits
+  17              		.align	2
+  20              	idau_ref:
+  21 0000 00000000 		.space	760
+  21      00000000 
+  21      00000000 
+  21      00000000 
+  21      00000000 
+  22              		.section	.rodata
+  23              		.align	2
+  24              	.LC0:
+  25 0000 5B307825 		.ascii	"[0x%08lx] sau %02d Secure=%d Secure(R:%d W:%d) Non-"
+  25      30386C78 
+  25      5D207361 
+  25      75202530 
+  25      32642053 
+  26 0033 73656375 		.ascii	"secure(R:%d W:%d)\012\000"
+  26      72652852 
+  26      3A256420 
+  26      573A2564 
+  26      290A00
+  27 0046 0000     		.align	2
+  28              	.LC2:
+  29 0048 5B307825 		.ascii	"[0x%08lx] idau %02d Secure=%d Secure(R:%d W:%d) Non"
+  29      30386C78 
+  29      5D206964 
+  29      61752025 
+  29      30326420 
+  30 007b 2D736563 		.ascii	"-secure(R:%d W:%d)\012\000"
+  30      75726528 
+  30      523A2564 
+  30      20573A25 
+  30      64290A00 
+  31 008f 00       		.align	2
+  32              	.LC4:
+  33 0090 53656375 		.ascii	"Secure Attribution Scan Done!\000"
+  33      72652041 
+  33      74747269 
+  33      62757469 
+  33      6F6E2053 
+  34              		.section	.text.SecureAttrib,"ax",%progbits
+  35              		.align	1
+  36              		.global	SecureAttrib
+  37              		.syntax unified
+  38              		.code	16
+  39              		.thumb_func
+  40              		.fpu softvfp
+  42              	SecureAttrib:
+  43              	.LFB97:
+  44              		.file 1 "../system/src/SecureAttrib.c"
+   1:../system/src/SecureAttrib.c **** /*-------------------------------------------------------------------------------------------------
+   2:../system/src/SecureAttrib.c **** /*                                                                                                 
+   3:../system/src/SecureAttrib.c **** /* Copyright (c) Nuvoton Technology Corp. All rights reserved.                                     
+   4:../system/src/SecureAttrib.c **** /*                                                                                                 
+   5:../system/src/SecureAttrib.c **** /*-------------------------------------------------------------------------------------------------
+   6:../system/src/SecureAttrib.c **** #include <stdio.h>
+   7:../system/src/SecureAttrib.c **** #include <arm_cmse.h>
+   8:../system/src/SecureAttrib.c **** #include "TC8234.h"
+   9:../system/src/SecureAttrib.c **** 
+  10:../system/src/SecureAttrib.c **** //#define FOR_SIMULATION
+  11:../system/src/SecureAttrib.c **** #ifdef FOR_SIMULATION
+  12:../system/src/SecureAttrib.c **** #define DbgPrintf(...)
+  13:../system/src/SecureAttrib.c **** #else
+  14:../system/src/SecureAttrib.c **** #define DbgPrintf printf
+  15:../system/src/SecureAttrib.c **** #endif
+  16:../system/src/SecureAttrib.c **** 
+  17:../system/src/SecureAttrib.c **** #if 0 // Bit definition of TT return data
+  18:../system/src/SecureAttrib.c **** typedef union
+  19:../system/src/SecureAttrib.c **** {
+  20:../system/src/SecureAttrib.c ****     struct cmse_address_info
+  21:../system/src/SecureAttrib.c ****     {
+  22:../system/src/SecureAttrib.c ****         unsigned mpu_region: 8;            /*bit 31-24*/
+  23:../system/src/SecureAttrib.c ****         unsigned sau_region: 8;            /*bit 23-16*/
+  24:../system/src/SecureAttrib.c ****         unsigned mpu_region_valid: 1;      /*bit 15-15*/
+  25:../system/src/SecureAttrib.c ****         unsigned sau_region_valid: 1;      /*bit 14-14*/
+  26:../system/src/SecureAttrib.c ****         unsigned read_ok: 1;               /*bit 13-13*/
+  27:../system/src/SecureAttrib.c ****         unsigned readwrite_ok: 1;          /*bit 12-12*/
+  28:../system/src/SecureAttrib.c ****         unsigned nonsecure_read_ok: 1;     /*bit 11-11*/
+  29:../system/src/SecureAttrib.c ****         unsigned nonsecure_readwrite_ok: 1; /*bit 10-10*/
+  30:../system/src/SecureAttrib.c ****         unsigned secure: 1;                /*bit 09-09*/
+  31:../system/src/SecureAttrib.c ****         unsigned idau_region_valid: 1;     /*bit 08-08*/
+  32:../system/src/SecureAttrib.c ****         unsigned idau_region: 8;           /*bit 07-00*/
+  33:../system/src/SecureAttrib.c ****     } flags;
+  34:../system/src/SecureAttrib.c ****     unsigned value;
+  35:../system/src/SecureAttrib.c **** } cmse_address_info_t;
+  36:../system/src/SecureAttrib.c **** #endif
+  37:../system/src/SecureAttrib.c **** 
+  38:../system/src/SecureAttrib.c **** /* Golden pattern for IDAU based on DTS IDAU memory map */
+  39:../system/src/SecureAttrib.c **** cmse_address_info_t idau_ref[190] =
+  40:../system/src/SecureAttrib.c **** {
+  41:../system/src/SecureAttrib.c **** #if 0
+  42:../system/src/SecureAttrib.c ****     /* NA, NA, NA, NA, sr, sw, nsr, nsw, ns, NA, region */
+  43:../system/src/SecureAttrib.c ****     {0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0},
+  44:../system/src/SecureAttrib.c ****     {0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 16},
+  45:../system/src/SecureAttrib.c ****     {0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1},
+  46:../system/src/SecureAttrib.c ****     {0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 2},
+  47:../system/src/SecureAttrib.c ****     {0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 17},
+  48:../system/src/SecureAttrib.c ****     {0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 3},
+  49:../system/src/SecureAttrib.c ****     {0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 4},
+  50:../system/src/SecureAttrib.c ****     {0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 5},
+  51:../system/src/SecureAttrib.c ****     {0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 6},
+  52:../system/src/SecureAttrib.c ****     {0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 7},
+  53:../system/src/SecureAttrib.c ****     {0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 8},
+  54:../system/src/SecureAttrib.c ****     {0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 9},
+  55:../system/src/SecureAttrib.c ****     {0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 10},
+  56:../system/src/SecureAttrib.c ****     {0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 11},
+  57:../system/src/SecureAttrib.c ****     {0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 12},
+  58:../system/src/SecureAttrib.c ****     {0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 13},
+  59:../system/src/SecureAttrib.c ****     {0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 99},
+  60:../system/src/SecureAttrib.c **** #endif
+  61:../system/src/SecureAttrib.c **** };
+  62:../system/src/SecureAttrib.c **** 
+  63:../system/src/SecureAttrib.c **** void SecureAttrib(void)
+  64:../system/src/SecureAttrib.c **** {
+  45              		.loc 1 64 0
+  46              		.cfi_startproc
+  47              		@ args = 0, pretend = 0, frame = 48
+  48              		@ frame_needed = 1, uses_anonymous_args = 0
+  49 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+  50              	.LCFI0:
+  51              		.cfi_def_cfa_offset 20
+  52              		.cfi_offset 4, -20
+  53              		.cfi_offset 5, -16
+  54              		.cfi_offset 6, -12
+  55              		.cfi_offset 7, -8
+  56              		.cfi_offset 14, -4
+  57 0002 91B0     		sub	sp, sp, #68
+  58              	.LCFI1:
+  59              		.cfi_def_cfa_offset 88
+  60 0004 04AF     		add	r7, sp, #16
+  61              	.LCFI2:
+  62              		.cfi_def_cfa 7, 72
+  65:../system/src/SecureAttrib.c ****     uint32_t u32Addr, u32PageSize;
+  66:../system/src/SecureAttrib.c ****     cmse_address_info_t info;
+  67:../system/src/SecureAttrib.c ****     int32_t idau, sau;
+  68:../system/src/SecureAttrib.c **** 
+  69:../system/src/SecureAttrib.c ****     idau = -1;
+  63              		.loc 1 69 0
+  64 0006 0123     		movs	r3, #1
+  65 0008 5B42     		rsbs	r3, r3, #0
+  66 000a BB62     		str	r3, [r7, #40]
+  70:../system/src/SecureAttrib.c ****     sau = -1;
+  67              		.loc 1 70 0
+  68 000c 0123     		movs	r3, #1
+  69 000e 5B42     		rsbs	r3, r3, #0
+  70 0010 7B62     		str	r3, [r7, #36]
+  71:../system/src/SecureAttrib.c ****     u32PageSize = 0x400;
+  71              		.loc 1 71 0
+  72 0012 40F20043 		movw	r3, #1024
+  73 0016 3B62     		str	r3, [r7, #32]
+  72:../system/src/SecureAttrib.c ****     for(u32Addr = 0; u32Addr < 0xFFFFEFFFul; u32Addr += u32PageSize)
+  74              		.loc 1 72 0
+  75 0018 0023     		movs	r3, #0
+  76 001a FB62     		str	r3, [r7, #44]
+  77 001c 65E0     		b	.L2
+  78              	.L5:
+  73:../system/src/SecureAttrib.c ****     {
+  74:../system/src/SecureAttrib.c ****         info = cmse_TT((void *)u32Addr);
+  79              		.loc 1 74 0
+  80 001e FB6A     		ldr	r3, [r7, #44]
+  81 0020 FB61     		str	r3, [r7, #28]
+  82              	.LBB6:
+  83              	.LBB7:
+  84              		.file 2 "c:\\program files\\gnu tools arm embedded\\6.2 2016q4\\lib\\gcc\\arm-none-eabi\\6.2.1\\in
+   1:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** /* ARMv8-M Secure Extensions intrinsics include file.
+   2:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** 
+   3:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****    Copyright (C) 2015-2016 Free Software Foundation, Inc.
+   4:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****    Contributed by ARM Ltd.
+   5:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** 
+   6:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****    This file is part of GCC.
+   7:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** 
+   8:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****    GCC is free software; you can redistribute it and/or modify it
+   9:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****    under the terms of the GNU General Public License as published
+  10:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****    by the Free Software Foundation; either version 3, or (at your
+  11:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****    option) any later version.
+  12:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** 
+  13:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****    GCC is distributed in the hope that it will be useful, but WITHOUT
+  14:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+  15:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
+  16:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****    License for more details.
+  17:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** 
+  18:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****    Under Section 7 of GPL version 3, you are granted additional
+  19:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****    permissions described in the GCC Runtime Library Exception, version
+  20:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****    3.1, as published by the Free Software Foundation.
+  21:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** 
+  22:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****    You should have received a copy of the GNU General Public License and
+  23:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****    a copy of the GCC Runtime Library Exception along with this program;
+  24:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****    see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+  25:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****    <http://www.gnu.org/licenses/>.  */
+  26:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** 
+  27:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** 
+  28:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** #ifndef _GCC_ARM_CMSE_H
+  29:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** #define _GCC_ARM_CMSE_H
+  30:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** 
+  31:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** #ifdef __cplusplus
+  32:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** extern "C" {
+  33:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** #endif
+  34:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** 
+  35:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** #if __ARM_FEATURE_CMSE & 1
+  36:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** 
+  37:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** #include <stddef.h>
+  38:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** #include <stdint.h>
+  39:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** 
+  40:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** #ifdef __ARM_BIG_ENDIAN
+  41:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** 
+  42:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** typedef union {
+  43:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****   struct cmse_address_info {
+  44:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** #if __ARM_FEATURE_CMSE & 2
+  45:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****     unsigned idau_region:8;
+  46:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****     unsigned idau_region_valid:1;
+  47:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****     unsigned secure:1;
+  48:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****     unsigned nonsecure_readwrite_ok:1;
+  49:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****     unsigned nonsecure_read_ok:1;
+  50:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** #else
+  51:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****     unsigned :12;
+  52:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** #endif
+  53:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****     unsigned readwrite_ok:1;
+  54:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****     unsigned read_ok:1;
+  55:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** #if __ARM_FEATURE_CMSE & 2
+  56:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****     unsigned sau_region_valid:1;
+  57:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** #else
+  58:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****     unsigned :1;
+  59:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** #endif
+  60:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****     unsigned mpu_region_valid:1;
+  61:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** #if __ARM_FEATURE_CMSE & 2
+  62:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****     unsigned sau_region:8;
+  63:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** #else
+  64:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****     unsigned :8;
+  65:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** #endif
+  66:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****     unsigned mpu_region:8;
+  67:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****   } flags;
+  68:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****   unsigned value;
+  69:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** } cmse_address_info_t;
+  70:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** 
+  71:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** #else
+  72:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** 
+  73:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** typedef union {
+  74:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****   struct cmse_address_info {
+  75:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****     unsigned mpu_region:8;
+  76:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** #if __ARM_FEATURE_CMSE & 2
+  77:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****     unsigned sau_region:8;
+  78:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** #else
+  79:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****     unsigned :8;
+  80:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** #endif
+  81:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****     unsigned mpu_region_valid:1;
+  82:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** #if __ARM_FEATURE_CMSE & 2
+  83:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****     unsigned sau_region_valid:1;
+  84:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** #else
+  85:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****     unsigned :1;
+  86:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** #endif
+  87:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****     unsigned read_ok:1;
+  88:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****     unsigned readwrite_ok:1;
+  89:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** #if __ARM_FEATURE_CMSE & 2
+  90:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****     unsigned nonsecure_read_ok:1;
+  91:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****     unsigned nonsecure_readwrite_ok:1;
+  92:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****     unsigned secure:1;
+  93:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****     unsigned idau_region_valid:1;
+  94:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****     unsigned idau_region:8;
+  95:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** #else
+  96:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****     unsigned :12;
+  97:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** #endif
+  98:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****   } flags;
+  99:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****   unsigned value;
+ 100:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** } cmse_address_info_t;
+ 101:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** 
+ 102:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** #endif /* __ARM_BIG_ENDIAN */
+ 103:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** 
+ 104:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** #define cmse_TT_fptr(p) (__cmse_TT_fptr ((__cmse_fptr)(p)))
+ 105:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** 
+ 106:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** typedef void (*__cmse_fptr)(void);
+ 107:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** 
+ 108:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** #define __CMSE_TT_ASM(flags) \
+ 109:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** { \
+ 110:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****   cmse_address_info_t __result; \
+ 111:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****    __asm__ ("tt" # flags " %0,%1" \
+ 112:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** 	   : "=r"(__result) \
+ 113:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** 	   : "r"(__p) \
+ 114:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** 	   : "memory"); \
+ 115:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h ****   return __result; \
+ 116:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** }
+ 117:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** 
+ 118:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** __extension__ static __inline __attribute__ ((__always_inline__))
+ 119:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** cmse_address_info_t
+ 120:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** __cmse_TT_fptr (__cmse_fptr __p)
+ 121:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** __CMSE_TT_ASM ()
+ 122:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** 
+ 123:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** __extension__ static __inline __attribute__ ((__always_inline__))
+ 124:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** cmse_address_info_t
+ 125:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** cmse_TT (void *__p)
+ 126:c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_cmse.h **** __CMSE_TT_ASM ()
+  85              		.loc 2 126 0
+  86 0022 FB69     		ldr	r3, [r7, #28]
+  87              		.syntax divided
+  88              	@ 126 "c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_c
+  89 0024 43E800F3 		tt r3,r3
+  90              	@ 0 "" 2
+  91              		.thumb
+  92              		.syntax unified
+  93 0028 FB60     		str	r3, [r7, #12]
+  94 002a FB68     		ldr	r3, [r7, #12]
+  95              	.LBE7:
+  96              	.LBE6:
+  97              		.loc 1 74 0
+  98 002c 7B61     		str	r3, [r7, #20]
+  75:../system/src/SecureAttrib.c **** 
+  76:../system/src/SecureAttrib.c ****         if(info.flags.sau_region_valid && 1)
+  99              		.loc 1 76 0
+ 100 002e 0E23     		movs	r3, #14
+ 101 0030 40F2080C 		movw	ip, #8
+ 102 0034 BC44     		add	ip, ip, r7
+ 103 0036 6344     		add	r3, r3, ip
+ 104 0038 1B78     		ldrb	r3, [r3]
+ 105 003a 0222     		movs	r2, #2
+ 106 003c 1340     		ands	r3, r2
+ 107 003e DBB2     		uxtb	r3, r3
+ 108 0040 002B     		cmp	r3, #0
+ 109 0042 4ED0     		beq	.L11
+  77:../system/src/SecureAttrib.c ****         {
+  78:../system/src/SecureAttrib.c ****             if(sau != info.flags.sau_region)
+ 110              		.loc 1 78 0
+ 111 0044 0C23     		movs	r3, #12
+ 112 0046 40F2080C 		movw	ip, #8
+ 113 004a BC44     		add	ip, ip, r7
+ 114 004c 6344     		add	r3, r3, ip
+ 115 004e 5B78     		ldrb	r3, [r3, #1]
+ 116 0050 1A00     		movs	r2, r3
+ 117 0052 7B6A     		ldr	r3, [r7, #36]
+ 118 0054 9A42     		cmp	r2, r3
+ 119 0056 44D0     		beq	.L11
+  79:../system/src/SecureAttrib.c ****             {
+  80:../system/src/SecureAttrib.c ****                 //printf("[0x%08x] sau %d\n", u32Addr, info.flags.sau_region);
+  81:../system/src/SecureAttrib.c ****                 printf("[0x%08lx] sau %02d Secure=%d Secure(R:%d W:%d) Non-secure(R:%d W:%d)\n", u3
+  82:../system/src/SecureAttrib.c ****                        info.flags.sau_region, info.flags.secure, info.flags.read_ok, info.flags.rea
+ 120              		.loc 1 82 0
+ 121 0058 0C23     		movs	r3, #12
+ 122 005a 40F2080C 		movw	ip, #8
+ 123 005e BC44     		add	ip, ip, r7
+ 124 0060 6344     		add	r3, r3, ip
+ 125 0062 5B78     		ldrb	r3, [r3, #1]
+  81:../system/src/SecureAttrib.c ****                        info.flags.sau_region, info.flags.secure, info.flags.read_ok, info.flags.rea
+ 126              		.loc 1 81 0
+ 127 0064 1E00     		movs	r6, r3
+ 128              		.loc 1 82 0
+ 129 0066 0E23     		movs	r3, #14
+ 130 0068 40F2080C 		movw	ip, #8
+ 131 006c BC44     		add	ip, ip, r7
+ 132 006e 6344     		add	r3, r3, ip
+ 133 0070 1B78     		ldrb	r3, [r3]
+ 134 0072 5B06     		lsls	r3, r3, #25
+ 135 0074 DB0F     		lsrs	r3, r3, #31
+ 136 0076 DBB2     		uxtb	r3, r3
+  81:../system/src/SecureAttrib.c ****                        info.flags.sau_region, info.flags.secure, info.flags.read_ok, info.flags.rea
+ 137              		.loc 1 81 0
+ 138 0078 7B60     		str	r3, [r7, #4]
+ 139              		.loc 1 82 0
+ 140 007a 0E22     		movs	r2, #14
+ 141 007c 0823     		movs	r3, #8
+ 142 007e FB18     		adds	r3, r7, r3
+ 143 0080 9B18     		adds	r3, r3, r2
+ 144 0082 1B78     		ldrb	r3, [r3]
+ 145 0084 5B07     		lsls	r3, r3, #29
+ 146 0086 DB0F     		lsrs	r3, r3, #31
+ 147 0088 DBB2     		uxtb	r3, r3
+  81:../system/src/SecureAttrib.c ****                        info.flags.sau_region, info.flags.secure, info.flags.read_ok, info.flags.rea
+ 148              		.loc 1 81 0
+ 149 008a 1A00     		movs	r2, r3
+ 150              		.loc 1 82 0
+ 151 008c 0E21     		movs	r1, #14
+ 152 008e 0823     		movs	r3, #8
+ 153 0090 FB18     		adds	r3, r7, r3
+ 154 0092 5B18     		adds	r3, r3, r1
+ 155 0094 1B78     		ldrb	r3, [r3]
+ 156 0096 1B07     		lsls	r3, r3, #28
+ 157 0098 DB0F     		lsrs	r3, r3, #31
+ 158 009a DBB2     		uxtb	r3, r3
+  81:../system/src/SecureAttrib.c ****                        info.flags.sau_region, info.flags.secure, info.flags.read_ok, info.flags.rea
+ 159              		.loc 1 81 0
+ 160 009c 1C00     		movs	r4, r3
+  83:../system/src/SecureAttrib.c ****                        info.flags.nonsecure_read_ok, info.flags.nonsecure_readwrite_ok);
+ 161              		.loc 1 83 0
+ 162 009e 0E21     		movs	r1, #14
+ 163 00a0 0823     		movs	r3, #8
+ 164 00a2 FB18     		adds	r3, r7, r3
+ 165 00a4 5B18     		adds	r3, r3, r1
+ 166 00a6 1B78     		ldrb	r3, [r3]
+ 167 00a8 DB06     		lsls	r3, r3, #27
+ 168 00aa DB0F     		lsrs	r3, r3, #31
+ 169 00ac DBB2     		uxtb	r3, r3
+  81:../system/src/SecureAttrib.c ****                        info.flags.sau_region, info.flags.secure, info.flags.read_ok, info.flags.rea
+ 170              		.loc 1 81 0
+ 171 00ae 1D00     		movs	r5, r3
+ 172              		.loc 1 83 0
+ 173 00b0 0E21     		movs	r1, #14
+ 174 00b2 0823     		movs	r3, #8
+ 175 00b4 FB18     		adds	r3, r7, r3
+ 176 00b6 5B18     		adds	r3, r3, r1
+ 177 00b8 1B78     		ldrb	r3, [r3]
+ 178 00ba 9B06     		lsls	r3, r3, #26
+ 179 00bc DB0F     		lsrs	r3, r3, #31
+ 180 00be DBB2     		uxtb	r3, r3
+  81:../system/src/SecureAttrib.c ****                        info.flags.sau_region, info.flags.secure, info.flags.read_ok, info.flags.rea
+ 181              		.loc 1 81 0
+ 182 00c0 F96A     		ldr	r1, [r7, #44]
+ 183 00c2 4648     		ldr	r0, .L12
+ 184 00c4 0393     		str	r3, [sp, #12]
+ 185 00c6 0295     		str	r5, [sp, #8]
+ 186 00c8 0194     		str	r4, [sp, #4]
+ 187 00ca 0092     		str	r2, [sp]
+ 188 00cc 7B68     		ldr	r3, [r7, #4]
+ 189 00ce 3200     		movs	r2, r6
+ 190 00d0 FFF7FEFF 		bl	printf
+  84:../system/src/SecureAttrib.c **** 
+  85:../system/src/SecureAttrib.c ****                 sau = info.flags.sau_region;
+ 191              		.loc 1 85 0
+ 192 00d4 0C23     		movs	r3, #12
+ 193 00d6 40F2080C 		movw	ip, #8
+ 194 00da BC44     		add	ip, ip, r7
+ 195 00dc 6344     		add	r3, r3, ip
+ 196 00de 5B78     		ldrb	r3, [r3, #1]
+ 197 00e0 7B62     		str	r3, [r7, #36]
+ 198              	.L11:
+  72:../system/src/SecureAttrib.c ****     {
+ 199              		.loc 1 72 0 discriminator 2
+ 200 00e2 FA6A     		ldr	r2, [r7, #44]
+ 201 00e4 3B6A     		ldr	r3, [r7, #32]
+ 202 00e6 D318     		adds	r3, r2, r3
+ 203 00e8 FB62     		str	r3, [r7, #44]
+ 204              	.L2:
+  72:../system/src/SecureAttrib.c ****     {
+ 205              		.loc 1 72 0 is_stmt 0 discriminator 1
+ 206 00ea FB6A     		ldr	r3, [r7, #44]
+ 207 00ec 3C4A     		ldr	r2, .L12+4
+ 208 00ee 9342     		cmp	r3, r2
+ 209 00f0 95D9     		bls	.L5
+  86:../system/src/SecureAttrib.c ****             }
+  87:../system/src/SecureAttrib.c ****         }
+  88:../system/src/SecureAttrib.c **** 
+  89:../system/src/SecureAttrib.c ****         if(info.flags.idau_region_valid && 0)
+  90:../system/src/SecureAttrib.c ****         {
+  91:../system/src/SecureAttrib.c ****             if(idau != info.flags.idau_region)
+  92:../system/src/SecureAttrib.c ****             {
+  93:../system/src/SecureAttrib.c ****                 printf("[0x%08lx] idau %02d Secure=%d Secure(R:%d W:%d) Non-secure(R:%d W:%d)\n", u
+  94:../system/src/SecureAttrib.c ****                        info.flags.idau_region, info.flags.secure, info.flags.read_ok, info.flags.re
+  95:../system/src/SecureAttrib.c ****                        info.flags.nonsecure_read_ok, info.flags.nonsecure_readwrite_ok);
+  96:../system/src/SecureAttrib.c ****                 idau = info.flags.idau_region;
+  97:../system/src/SecureAttrib.c ****             }
+  98:../system/src/SecureAttrib.c ****         }
+  99:../system/src/SecureAttrib.c ****     }
+ 100:../system/src/SecureAttrib.c **** 
+ 101:../system/src/SecureAttrib.c **** 
+ 102:../system/src/SecureAttrib.c ****     for(u32Addr = 0; u32Addr < 0xFFFFEFFFul; u32Addr += u32PageSize)
+ 210              		.loc 1 102 0 is_stmt 1
+ 211 00f2 0023     		movs	r3, #0
+ 212 00f4 FB62     		str	r3, [r7, #44]
+ 213 00f6 65E0     		b	.L6
+ 214              	.L9:
+ 103:../system/src/SecureAttrib.c ****     {
+ 104:../system/src/SecureAttrib.c ****         info = cmse_TT((void *)u32Addr);
+ 215              		.loc 1 104 0
+ 216 00f8 FB6A     		ldr	r3, [r7, #44]
+ 217 00fa BB61     		str	r3, [r7, #24]
+ 218              	.LBB8:
+ 219              	.LBB9:
+ 220              		.loc 2 126 0
+ 221 00fc BB69     		ldr	r3, [r7, #24]
+ 222              		.syntax divided
+ 223              	@ 126 "c:\program files\gnu tools arm embedded\6.2 2016q4\lib\gcc\arm-none-eabi\6.2.1\include\arm_c
+ 224 00fe 43E800F3 		tt r3,r3
+ 225              	@ 0 "" 2
+ 226              		.thumb
+ 227              		.syntax unified
+ 228 0102 3B61     		str	r3, [r7, #16]
+ 229 0104 3B69     		ldr	r3, [r7, #16]
+ 230              	.LBE9:
+ 231              	.LBE8:
+ 232              		.loc 1 104 0
+ 233 0106 7B61     		str	r3, [r7, #20]
+ 105:../system/src/SecureAttrib.c **** 
+ 106:../system/src/SecureAttrib.c ****         if(info.flags.sau_region_valid && 0)
+ 107:../system/src/SecureAttrib.c ****         {
+ 108:../system/src/SecureAttrib.c ****             if(sau != info.flags.sau_region)
+ 109:../system/src/SecureAttrib.c ****             {
+ 110:../system/src/SecureAttrib.c ****                 printf("[0x%08lx] sau %02d Secure=%d Secure(R:%d W:%d) Non-secure(R:%d W:%d)\n", u3
+ 111:../system/src/SecureAttrib.c ****                        info.flags.sau_region, info.flags.secure, info.flags.read_ok, info.flags.rea
+ 112:../system/src/SecureAttrib.c ****                        info.flags.nonsecure_read_ok, info.flags.nonsecure_readwrite_ok);
+ 113:../system/src/SecureAttrib.c **** 
+ 114:../system/src/SecureAttrib.c ****                 sau = info.flags.sau_region;
+ 115:../system/src/SecureAttrib.c ****             }
+ 116:../system/src/SecureAttrib.c ****         }
+ 117:../system/src/SecureAttrib.c **** 
+ 118:../system/src/SecureAttrib.c ****         if(info.flags.idau_region_valid && 1)
+ 234              		.loc 1 118 0
+ 235 0108 0E23     		movs	r3, #14
+ 236 010a 40F2080C 		movw	ip, #8
+ 237 010e BC44     		add	ip, ip, r7
+ 238 0110 6344     		add	r3, r3, ip
+ 239 0112 1B78     		ldrb	r3, [r3]
+ 240 0114 7F22     		movs	r2, #127
+ 241 0116 9343     		bics	r3, r2
+ 242 0118 DBB2     		uxtb	r3, r3
+ 243 011a 002B     		cmp	r3, #0
+ 244 011c 4ED0     		beq	.L8
+ 119:../system/src/SecureAttrib.c ****         {
+ 120:../system/src/SecureAttrib.c ****             if(idau != info.flags.idau_region)
+ 245              		.loc 1 120 0
+ 246 011e 0C23     		movs	r3, #12
+ 247 0120 40F2080C 		movw	ip, #8
+ 248 0124 BC44     		add	ip, ip, r7
+ 249 0126 6344     		add	r3, r3, ip
+ 250 0128 DB78     		ldrb	r3, [r3, #3]
+ 251 012a 1A00     		movs	r2, r3
+ 252 012c BB6A     		ldr	r3, [r7, #40]
+ 253 012e 9A42     		cmp	r2, r3
+ 254 0130 44D0     		beq	.L8
+ 121:../system/src/SecureAttrib.c ****             {
+ 122:../system/src/SecureAttrib.c ****                 printf("[0x%08lx] idau %02d Secure=%d Secure(R:%d W:%d) Non-secure(R:%d W:%d)\n", u
+ 123:../system/src/SecureAttrib.c ****                        info.flags.idau_region, info.flags.secure, info.flags.read_ok, info.flags.re
+ 255              		.loc 1 123 0
+ 256 0132 0C23     		movs	r3, #12
+ 257 0134 40F2080C 		movw	ip, #8
+ 258 0138 BC44     		add	ip, ip, r7
+ 259 013a 6344     		add	r3, r3, ip
+ 260 013c DB78     		ldrb	r3, [r3, #3]
+ 122:../system/src/SecureAttrib.c ****                        info.flags.idau_region, info.flags.secure, info.flags.read_ok, info.flags.re
+ 261              		.loc 1 122 0
+ 262 013e 1E00     		movs	r6, r3
+ 263              		.loc 1 123 0
+ 264 0140 0E23     		movs	r3, #14
+ 265 0142 40F2080C 		movw	ip, #8
+ 266 0146 BC44     		add	ip, ip, r7
+ 267 0148 6344     		add	r3, r3, ip
+ 268 014a 1B78     		ldrb	r3, [r3]
+ 269 014c 5B06     		lsls	r3, r3, #25
+ 270 014e DB0F     		lsrs	r3, r3, #31
+ 271 0150 DBB2     		uxtb	r3, r3
+ 122:../system/src/SecureAttrib.c ****                        info.flags.idau_region, info.flags.secure, info.flags.read_ok, info.flags.re
+ 272              		.loc 1 122 0
+ 273 0152 7B60     		str	r3, [r7, #4]
+ 274              		.loc 1 123 0
+ 275 0154 0E22     		movs	r2, #14
+ 276 0156 0823     		movs	r3, #8
+ 277 0158 FB18     		adds	r3, r7, r3
+ 278 015a 9B18     		adds	r3, r3, r2
+ 279 015c 1B78     		ldrb	r3, [r3]
+ 280 015e 5B07     		lsls	r3, r3, #29
+ 281 0160 DB0F     		lsrs	r3, r3, #31
+ 282 0162 DBB2     		uxtb	r3, r3
+ 122:../system/src/SecureAttrib.c ****                        info.flags.idau_region, info.flags.secure, info.flags.read_ok, info.flags.re
+ 283              		.loc 1 122 0
+ 284 0164 1A00     		movs	r2, r3
+ 285              		.loc 1 123 0
+ 286 0166 0E21     		movs	r1, #14
+ 287 0168 0823     		movs	r3, #8
+ 288 016a FB18     		adds	r3, r7, r3
+ 289 016c 5B18     		adds	r3, r3, r1
+ 290 016e 1B78     		ldrb	r3, [r3]
+ 291 0170 1B07     		lsls	r3, r3, #28
+ 292 0172 DB0F     		lsrs	r3, r3, #31
+ 293 0174 DBB2     		uxtb	r3, r3
+ 122:../system/src/SecureAttrib.c ****                        info.flags.idau_region, info.flags.secure, info.flags.read_ok, info.flags.re
+ 294              		.loc 1 122 0
+ 295 0176 1C00     		movs	r4, r3
+ 124:../system/src/SecureAttrib.c ****                        info.flags.nonsecure_read_ok, info.flags.nonsecure_readwrite_ok);
+ 296              		.loc 1 124 0
+ 297 0178 0E21     		movs	r1, #14
+ 298 017a 0823     		movs	r3, #8
+ 299 017c FB18     		adds	r3, r7, r3
+ 300 017e 5B18     		adds	r3, r3, r1
+ 301 0180 1B78     		ldrb	r3, [r3]
+ 302 0182 DB06     		lsls	r3, r3, #27
+ 303 0184 DB0F     		lsrs	r3, r3, #31
+ 304 0186 DBB2     		uxtb	r3, r3
+ 122:../system/src/SecureAttrib.c ****                        info.flags.idau_region, info.flags.secure, info.flags.read_ok, info.flags.re
+ 305              		.loc 1 122 0
+ 306 0188 1D00     		movs	r5, r3
+ 307              		.loc 1 124 0
+ 308 018a 0E21     		movs	r1, #14
+ 309 018c 0823     		movs	r3, #8
+ 310 018e FB18     		adds	r3, r7, r3
+ 311 0190 5B18     		adds	r3, r3, r1
+ 312 0192 1B78     		ldrb	r3, [r3]
+ 313 0194 9B06     		lsls	r3, r3, #26
+ 314 0196 DB0F     		lsrs	r3, r3, #31
+ 315 0198 DBB2     		uxtb	r3, r3
+ 122:../system/src/SecureAttrib.c ****                        info.flags.idau_region, info.flags.secure, info.flags.read_ok, info.flags.re
+ 316              		.loc 1 122 0
+ 317 019a F96A     		ldr	r1, [r7, #44]
+ 318 019c 1148     		ldr	r0, .L12+8
+ 319 019e 0393     		str	r3, [sp, #12]
+ 320 01a0 0295     		str	r5, [sp, #8]
+ 321 01a2 0194     		str	r4, [sp, #4]
+ 322 01a4 0092     		str	r2, [sp]
+ 323 01a6 7B68     		ldr	r3, [r7, #4]
+ 324 01a8 3200     		movs	r2, r6
+ 325 01aa FFF7FEFF 		bl	printf
+ 125:../system/src/SecureAttrib.c ****                 idau = info.flags.idau_region;
+ 326              		.loc 1 125 0
+ 327 01ae 0C23     		movs	r3, #12
+ 328 01b0 40F2080C 		movw	ip, #8
+ 329 01b4 BC44     		add	ip, ip, r7
+ 330 01b6 6344     		add	r3, r3, ip
+ 331 01b8 DB78     		ldrb	r3, [r3, #3]
+ 332 01ba BB62     		str	r3, [r7, #40]
+ 333              	.L8:
+ 102:../system/src/SecureAttrib.c ****     {
+ 334              		.loc 1 102 0 discriminator 2
+ 335 01bc FA6A     		ldr	r2, [r7, #44]
+ 336 01be 3B6A     		ldr	r3, [r7, #32]
+ 337 01c0 D318     		adds	r3, r2, r3
+ 338 01c2 FB62     		str	r3, [r7, #44]
+ 339              	.L6:
+ 102:../system/src/SecureAttrib.c ****     {
+ 340              		.loc 1 102 0 is_stmt 0 discriminator 1
+ 341 01c4 FB6A     		ldr	r3, [r7, #44]
+ 342 01c6 064A     		ldr	r2, .L12+4
+ 343 01c8 9342     		cmp	r3, r2
+ 344 01ca 95D9     		bls	.L9
+ 126:../system/src/SecureAttrib.c ****             }
+ 127:../system/src/SecureAttrib.c ****         }
+ 128:../system/src/SecureAttrib.c ****     }
+ 129:../system/src/SecureAttrib.c **** 
+ 130:../system/src/SecureAttrib.c ****     DbgPrintf("Secure Attribution Scan Done!\n");
+ 345              		.loc 1 130 0 is_stmt 1
+ 346 01cc 064B     		ldr	r3, .L12+12
+ 347 01ce 1800     		movs	r0, r3
+ 348 01d0 FFF7FEFF 		bl	puts
+ 131:../system/src/SecureAttrib.c **** 
+ 132:../system/src/SecureAttrib.c ****     return ;
+ 349              		.loc 1 132 0
+ 350 01d4 C046     		nop
+ 133:../system/src/SecureAttrib.c **** }
+ 351              		.loc 1 133 0
+ 352 01d6 BD46     		mov	sp, r7
+ 353 01d8 0DB0     		add	sp, sp, #52
+ 354              		@ sp needed
+ 355 01da F0BD     		pop	{r4, r5, r6, r7, pc}
+ 356              	.L13:
+ 357              		.align	2
+ 358              	.L12:
+ 359 01dc 00000000 		.word	.LC0
+ 360 01e0 FEEFFFFF 		.word	-4098
+ 361 01e4 48000000 		.word	.LC2
+ 362 01e8 90000000 		.word	.LC4
+ 363              		.cfi_endproc
+ 364              	.LFE97:
+ 366              		.text
+ 367              	.Letext0:
+ 368              		.file 3 "c:\\program files\\gnu tools arm embedded\\6.2 2016q4\\arm-none-eabi\\include\\machine\\_
+ 369              		.file 4 "c:\\program files\\gnu tools arm embedded\\6.2 2016q4\\arm-none-eabi\\include\\sys\\lock.
+ 370              		.file 5 "c:\\program files\\gnu tools arm embedded\\6.2 2016q4\\arm-none-eabi\\include\\sys\\_type
+ 371              		.file 6 "c:\\program files\\gnu tools arm embedded\\6.2 2016q4\\lib\\gcc\\arm-none-eabi\\6.2.1\\in
+ 372              		.file 7 "c:\\program files\\gnu tools arm embedded\\6.2 2016q4\\arm-none-eabi\\include\\sys\\reent
+ 373              		.file 8 "c:\\program files\\gnu tools arm embedded\\6.2 2016q4\\arm-none-eabi\\include\\sys\\_stdi
+ 374              		.file 9 "../system/include/DEVICE/system_TC8234.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 SecureAttrib.c
+C:\Users\CCMA\AppData\Local\Temp\ccTfZGEq.s:20     .bss.idau_ref:00000000 idau_ref
+C:\Users\CCMA\AppData\Local\Temp\ccTfZGEq.s:17     .bss.idau_ref:00000000 $d
+C:\Users\CCMA\AppData\Local\Temp\ccTfZGEq.s:23     .rodata:00000000 $d
+C:\Users\CCMA\AppData\Local\Temp\ccTfZGEq.s:35     .text.SecureAttrib:00000000 $t
+C:\Users\CCMA\AppData\Local\Temp\ccTfZGEq.s:42     .text.SecureAttrib:00000000 SecureAttrib
+C:\Users\CCMA\AppData\Local\Temp\ccTfZGEq.s:359    .text.SecureAttrib:000001dc $d
+                     .debug_frame:00000010 $d
+                           .group:00000000 wm4.0.087e176d0399834c705147ed10b7207a
+                           .group:00000000 wm4._newlib_version.h.4.ad342815780c8db09778091a421b5b5b
+                           .group:00000000 wm4.newlib.h.34.ade2dd58293cce3191e5024d8824a202
+                           .group:00000000 wm4.features.h.22.5cdadbb3efe495d1c9e38350b8c376c7
+                           .group:00000000 wm4.config.h.219.341816d1cc54601a0d2a3e284e3d034c
+                           .group:00000000 wm4._ansi.h.23.9f8fcfa20193763fcf364fb91705c94b
+                           .group:00000000 wm4.stdio.h.31.7c0e28c411445f3f9c5b11accf882760
+                           .group:00000000 wm4._default_types.h.6.959254cf5f09734ea7516c89e8bb21bd
+                           .group:00000000 wm4.stddef.h.187.2ff233552538c6ff9b8575ca8ea52cb3
+                           .group:00000000 wm4.cdefs.h.47.d472b786fad7f248e8524f569f3d5350
+                           .group:00000000 wm4.stddef.h.39.ec95e8feac892e292b69dc7ae75b0d64
+                           .group:00000000 wm4.stdarg.h.34.3a23a216c0c293b3d2ea2e89281481e6
+                           .group:00000000 wm4.lock.h.2.9bc98482741e5e2a9450b12934a684ea
+                           .group:00000000 wm4._types.h.125.5cf8a495f1f7ef36777ad868a1e32068
+                           .group:00000000 wm4.stddef.h.161.5349cb105733e8777bfb0cf53c4e3f34
+                           .group:00000000 wm4._types.h.183.c226d164ceca1f2ecb9ae9360c54a098
+                           .group:00000000 wm4.reent.h.17.5c31af1d4f47d2ada260e08fff34fcec
+                           .group:00000000 wm4.assert.h.11.db24e541f16414db224bf986d21017e2
+                           .group:00000000 wm4.reent.h.460.578a1080094974ec74f6c48bcf356980
+                           .group:00000000 wm4.types.h.40.e8c16e7ec36ba55f133d0616070e25fc
+                           .group:00000000 wm4._stdint.h.10.c24fa3af3bc1706662bb5593a907e841
+                           .group:00000000 wm4._endian.h.31.65a10590763c3dde1ac4a7f66d7d4891
+                           .group:00000000 wm4.endian.h.9.49f3a4695c1b61e8a0808de3c4a106cb
+                           .group:00000000 wm4._timeval.h.30.0e8bfd94e85db17dda3286ee81496fe6
+                           .group:00000000 wm4.timespec.h.41.d855182eb0e690443ab8651bcedca6e1
+                           .group:00000000 wm4.select.h.30.bbece7fa40993a78092dcc5805132560
+                           .group:00000000 wm4.types.h.69.ed3eae3cf73030a737515151ebcab7a1
+                           .group:00000000 wm4.stdio.h.2.4aa87247282eca6c8f36f9de33d8df1a
+                           .group:00000000 wm4.stdio.h.81.e75815e468af71def73c328e3aabfd80
+                           .group:00000000 wm4._intsup.h.10.cce27fed8484c08a33f522034c30d2b5
+                           .group:00000000 wm4.stdint.h.23.d53047a68f4a85177f80b422d52785ed
+                           .group:00000000 wm4.arm_cmse.h.104.db8f8a5477ac2f9cf04eed00ba17e2d7
+                           .group:00000000 wm4.TC8234.h.41.e8307e65782f050acdedaa1c99902eda
+                           .group:00000000 wm4.core_cm23.h.32.a9d816557513dcc45f61a5743050ed37
+                           .group:00000000 wm4.cmsis_gcc.h.26.41038879cf168e2c536d47f29b7e8dd8
+                           .group:00000000 wm4.core_cm23.h.125.ba48219c7506089842d5c01f4f336b70
+                           .group:00000000 wm4.system_TC8234.h.13.5aa1165126f7ad438a96056b8f9767cd
+                           .group:00000000 wm4.TC8234.h.489.097065e3a879549c91dbff33e7fde3c1
+                           .group:00000000 wm4.sys.h.13.e2db55f2643ef5a4b9e5848a3c47eacf
+                           .group:00000000 wm4.clk.h.13.344c384269bede121fbfa7337007cf2d
+                           .group:00000000 wm4.uart.h.12.31952ad1e577cb5eb9dad9ec3ec13b6a
+
+UNDEFINED SYMBOLS
+printf
+puts

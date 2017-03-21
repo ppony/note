@@ -1,0 +1,1211 @@
+   1              		.cpu cortex-m23
+   2              		.eabi_attribute 20, 1
+   3              		.eabi_attribute 21, 1
+   4              		.eabi_attribute 23, 3
+   5              		.eabi_attribute 24, 1
+   6              		.eabi_attribute 25, 1
+   7              		.eabi_attribute 26, 1
+   8              		.eabi_attribute 30, 6
+   9              		.eabi_attribute 34, 0
+  10              		.eabi_attribute 18, 4
+  11              		.file	"system_TC8234.c"
+  12              		.text
+  13              	.Ltext0:
+  14              		.cfi_sections	.debug_frame
+  15              		.section	.text.TZ_SAU_Setup,"ax",%progbits
+  16              		.align	1
+  17              		.syntax unified
+  18              		.code	16
+  19              		.thumb_func
+  20              		.fpu softvfp
+  22              	TZ_SAU_Setup:
+  23              	.LFB88:
+  24              		.file 1 "../system/include/DEVICE/partition_TC8234.h"
+   1:../system/include/DEVICE/partition_TC8234.h **** /**************************************************************************//**
+   2:../system/include/DEVICE/partition_TC8234.h ****  * @file     partition_TC8234.c
+   3:../system/include/DEVICE/partition_TC8234.h ****  * @version  V2.00
+   4:../system/include/DEVICE/partition_TC8234.h ****  * $Revision: 3 $
+   5:../system/include/DEVICE/partition_TC8234.h ****  * $Date: 16/08/15 6:25p $
+   6:../system/include/DEVICE/partition_TC8234.h ****  * @brief    SAU configuration for secure/nonsecure region settings.
+   7:../system/include/DEVICE/partition_TC8234.h ****  *
+   8:../system/include/DEVICE/partition_TC8234.h ****  * @note
+   9:../system/include/DEVICE/partition_TC8234.h ****  * Copyright (C) 2016 Nuvoton Technology Corp. All rights reserved.
+  10:../system/include/DEVICE/partition_TC8234.h ****  *
+  11:../system/include/DEVICE/partition_TC8234.h ****  ******************************************************************************/
+  12:../system/include/DEVICE/partition_TC8234.h **** 
+  13:../system/include/DEVICE/partition_TC8234.h **** #ifndef PARTITION_TC8234
+  14:../system/include/DEVICE/partition_TC8234.h **** #define PARTITION_TC8234
+  15:../system/include/DEVICE/partition_TC8234.h **** 
+  16:../system/include/DEVICE/partition_TC8234.h **** /*
+  17:../system/include/DEVICE/partition_TC8234.h **** //-------- <<< Use Configuration Wizard in Context Menu >>> -----------------
+  18:../system/include/DEVICE/partition_TC8234.h **** */
+  19:../system/include/DEVICE/partition_TC8234.h **** 
+  20:../system/include/DEVICE/partition_TC8234.h **** /*
+  21:../system/include/DEVICE/partition_TC8234.h **** // <e>Secure Attribute Unit (SAU) Control
+  22:../system/include/DEVICE/partition_TC8234.h **** */
+  23:../system/include/DEVICE/partition_TC8234.h **** #define SAU_INIT_CTRL 1
+  24:../system/include/DEVICE/partition_TC8234.h **** 
+  25:../system/include/DEVICE/partition_TC8234.h **** /*
+  26:../system/include/DEVICE/partition_TC8234.h **** //   <q> Enable SAU
+  27:../system/include/DEVICE/partition_TC8234.h **** //   <i> To enable Secure Attribute Unit (SAU).
+  28:../system/include/DEVICE/partition_TC8234.h **** */
+  29:../system/include/DEVICE/partition_TC8234.h **** #define SAU_INIT_CTRL_ENABLE 1
+  30:../system/include/DEVICE/partition_TC8234.h **** 
+  31:../system/include/DEVICE/partition_TC8234.h **** /*
+  32:../system/include/DEVICE/partition_TC8234.h **** //   <o> All Memory Attribute When SAU is disabled
+  33:../system/include/DEVICE/partition_TC8234.h **** //     <0=> All Memory is Secure
+  34:../system/include/DEVICE/partition_TC8234.h **** //     <1=> All Memory is Non-Secure
+  35:../system/include/DEVICE/partition_TC8234.h **** //   <i> To set the ALLNS bit in SAU CTRL.
+  36:../system/include/DEVICE/partition_TC8234.h **** //   <i> When all Memory is Non-Secure (ALLNS is 1), IDAU can override memory map configuration.
+  37:../system/include/DEVICE/partition_TC8234.h **** */
+  38:../system/include/DEVICE/partition_TC8234.h **** #define SAU_INIT_CTRL_ALLNS  0
+  39:../system/include/DEVICE/partition_TC8234.h **** 
+  40:../system/include/DEVICE/partition_TC8234.h **** /*
+  41:../system/include/DEVICE/partition_TC8234.h **** // </e>
+  42:../system/include/DEVICE/partition_TC8234.h **** */
+  43:../system/include/DEVICE/partition_TC8234.h **** 
+  44:../system/include/DEVICE/partition_TC8234.h **** /*
+  45:../system/include/DEVICE/partition_TC8234.h **** // <h>Enable and Set Secure/Non-Secure region
+  46:../system/include/DEVICE/partition_TC8234.h **** */
+  47:../system/include/DEVICE/partition_TC8234.h **** #define SAU_REGIONS_MAX   8                 /* Max. number of SAU regions */
+  48:../system/include/DEVICE/partition_TC8234.h **** 
+  49:../system/include/DEVICE/partition_TC8234.h **** /*
+  50:../system/include/DEVICE/partition_TC8234.h **** //   <e>SAU Region 0
+  51:../system/include/DEVICE/partition_TC8234.h **** //   <i> Setup SAU Region 0
+  52:../system/include/DEVICE/partition_TC8234.h **** */
+  53:../system/include/DEVICE/partition_TC8234.h **** #define SAU_INIT_REGION0    1
+  54:../system/include/DEVICE/partition_TC8234.h **** /*
+  55:../system/include/DEVICE/partition_TC8234.h **** //     <o>Start Address <0-0xFFFFFFE0>
+  56:../system/include/DEVICE/partition_TC8234.h **** */
+  57:../system/include/DEVICE/partition_TC8234.h **** #define SAU_INIT_START0     0x00000000      /* start address of SAU region 0 */
+  58:../system/include/DEVICE/partition_TC8234.h **** /*
+  59:../system/include/DEVICE/partition_TC8234.h **** //     <o>End Address <0x1F-0xFFFFFFFF>
+  60:../system/include/DEVICE/partition_TC8234.h **** */
+  61:../system/include/DEVICE/partition_TC8234.h **** #define SAU_INIT_END0       0x00040000      /* end address of SAU region 0 */
+  62:../system/include/DEVICE/partition_TC8234.h **** /*
+  63:../system/include/DEVICE/partition_TC8234.h **** //     <o>Region is
+  64:../system/include/DEVICE/partition_TC8234.h **** //         <0=>Non-Secure
+  65:../system/include/DEVICE/partition_TC8234.h **** //         <1=>Secure, Non-Secure Callable
+  66:../system/include/DEVICE/partition_TC8234.h **** */
+  67:../system/include/DEVICE/partition_TC8234.h **** #define SAU_INIT_NSC0       1
+  68:../system/include/DEVICE/partition_TC8234.h **** /*
+  69:../system/include/DEVICE/partition_TC8234.h **** //   </e>
+  70:../system/include/DEVICE/partition_TC8234.h **** */
+  71:../system/include/DEVICE/partition_TC8234.h **** 
+  72:../system/include/DEVICE/partition_TC8234.h **** /*
+  73:../system/include/DEVICE/partition_TC8234.h **** //   <e>SAU Region 1
+  74:../system/include/DEVICE/partition_TC8234.h **** //   <i> Setup SAU Region 1
+  75:../system/include/DEVICE/partition_TC8234.h **** */
+  76:../system/include/DEVICE/partition_TC8234.h **** #define SAU_INIT_REGION1    1
+  77:../system/include/DEVICE/partition_TC8234.h **** /*
+  78:../system/include/DEVICE/partition_TC8234.h **** //     <o>Start Address <0-0xFFFFFFE0>
+  79:../system/include/DEVICE/partition_TC8234.h **** */
+  80:../system/include/DEVICE/partition_TC8234.h **** #define SAU_INIT_START1     0x10040000
+  81:../system/include/DEVICE/partition_TC8234.h **** /*
+  82:../system/include/DEVICE/partition_TC8234.h **** //     <o>End Address <0x1F-0xFFFFFFFF>
+  83:../system/include/DEVICE/partition_TC8234.h **** */
+  84:../system/include/DEVICE/partition_TC8234.h **** #define SAU_INIT_END1       0x1007FFFF
+  85:../system/include/DEVICE/partition_TC8234.h **** /*
+  86:../system/include/DEVICE/partition_TC8234.h **** //     <o>Region is
+  87:../system/include/DEVICE/partition_TC8234.h **** //         <0=>Non-Secure
+  88:../system/include/DEVICE/partition_TC8234.h **** //         <1=>Secure, Non-Secure Callable
+  89:../system/include/DEVICE/partition_TC8234.h **** */
+  90:../system/include/DEVICE/partition_TC8234.h **** #define SAU_INIT_NSC1       0
+  91:../system/include/DEVICE/partition_TC8234.h **** /*
+  92:../system/include/DEVICE/partition_TC8234.h **** //   </e>
+  93:../system/include/DEVICE/partition_TC8234.h **** */
+  94:../system/include/DEVICE/partition_TC8234.h **** 
+  95:../system/include/DEVICE/partition_TC8234.h **** /*
+  96:../system/include/DEVICE/partition_TC8234.h **** //   <e>SAU Region 2
+  97:../system/include/DEVICE/partition_TC8234.h **** //   <i> Setup SAU Region 2
+  98:../system/include/DEVICE/partition_TC8234.h **** */
+  99:../system/include/DEVICE/partition_TC8234.h **** #define SAU_INIT_REGION2    1
+ 100:../system/include/DEVICE/partition_TC8234.h **** /*
+ 101:../system/include/DEVICE/partition_TC8234.h **** //     <o>Start Address <0-0xFFFFFFE0>
+ 102:../system/include/DEVICE/partition_TC8234.h **** */
+ 103:../system/include/DEVICE/partition_TC8234.h **** #define SAU_INIT_START2     0x2000FC00
+ 104:../system/include/DEVICE/partition_TC8234.h **** /*
+ 105:../system/include/DEVICE/partition_TC8234.h **** //     <o>End Address <0x1F-0xFFFFFFFF>
+ 106:../system/include/DEVICE/partition_TC8234.h **** */
+ 107:../system/include/DEVICE/partition_TC8234.h **** #define SAU_INIT_END2       0x2000FFFF
+ 108:../system/include/DEVICE/partition_TC8234.h **** /*
+ 109:../system/include/DEVICE/partition_TC8234.h **** //     <o>Region is
+ 110:../system/include/DEVICE/partition_TC8234.h **** //         <0=>Non-Secure
+ 111:../system/include/DEVICE/partition_TC8234.h **** //         <1=>Secure, Non-Secure Callable
+ 112:../system/include/DEVICE/partition_TC8234.h **** */
+ 113:../system/include/DEVICE/partition_TC8234.h **** #define SAU_INIT_NSC2       1
+ 114:../system/include/DEVICE/partition_TC8234.h **** /*
+ 115:../system/include/DEVICE/partition_TC8234.h **** //   </e>
+ 116:../system/include/DEVICE/partition_TC8234.h **** */
+ 117:../system/include/DEVICE/partition_TC8234.h **** 
+ 118:../system/include/DEVICE/partition_TC8234.h **** /*
+ 119:../system/include/DEVICE/partition_TC8234.h **** //   <e>SAU Region 3
+ 120:../system/include/DEVICE/partition_TC8234.h **** //   <i> Setup SAU Region 3
+ 121:../system/include/DEVICE/partition_TC8234.h **** */
+ 122:../system/include/DEVICE/partition_TC8234.h **** #define SAU_INIT_REGION3    1
+ 123:../system/include/DEVICE/partition_TC8234.h **** /*
+ 124:../system/include/DEVICE/partition_TC8234.h **** //     <o>Start Address <0-0xFFFFFFE0>
+ 125:../system/include/DEVICE/partition_TC8234.h **** */
+ 126:../system/include/DEVICE/partition_TC8234.h **** #define SAU_INIT_START3     0x30010000
+ 127:../system/include/DEVICE/partition_TC8234.h **** /*
+ 128:../system/include/DEVICE/partition_TC8234.h **** //     <o>End Address <0x1F-0xFFFFFFFF>
+ 129:../system/include/DEVICE/partition_TC8234.h **** */
+ 130:../system/include/DEVICE/partition_TC8234.h **** #define SAU_INIT_END3       0x3001FFFF
+ 131:../system/include/DEVICE/partition_TC8234.h **** /*
+ 132:../system/include/DEVICE/partition_TC8234.h **** //     <o>Region is
+ 133:../system/include/DEVICE/partition_TC8234.h **** //         <0=>Non-Secure
+ 134:../system/include/DEVICE/partition_TC8234.h **** //         <1=>Secure, Non-Secure Callable
+ 135:../system/include/DEVICE/partition_TC8234.h **** */
+ 136:../system/include/DEVICE/partition_TC8234.h **** #define SAU_INIT_NSC3       0
+ 137:../system/include/DEVICE/partition_TC8234.h **** /*
+ 138:../system/include/DEVICE/partition_TC8234.h **** //   </e>
+ 139:../system/include/DEVICE/partition_TC8234.h **** */
+ 140:../system/include/DEVICE/partition_TC8234.h **** 
+ 141:../system/include/DEVICE/partition_TC8234.h **** /*
+ 142:../system/include/DEVICE/partition_TC8234.h **** //   <e>SAU Region 4
+ 143:../system/include/DEVICE/partition_TC8234.h **** //   <i> Setup SAU Region 4
+ 144:../system/include/DEVICE/partition_TC8234.h **** */
+ 145:../system/include/DEVICE/partition_TC8234.h **** #define SAU_INIT_REGION4    1
+ 146:../system/include/DEVICE/partition_TC8234.h **** /*
+ 147:../system/include/DEVICE/partition_TC8234.h **** //     <o>Start Address <0-0xFFFFFFE0>
+ 148:../system/include/DEVICE/partition_TC8234.h **** */
+ 149:../system/include/DEVICE/partition_TC8234.h **** #define SAU_INIT_START4     0x50000000      /* start address of SAU region 4 */
+ 150:../system/include/DEVICE/partition_TC8234.h **** 
+ 151:../system/include/DEVICE/partition_TC8234.h **** /*
+ 152:../system/include/DEVICE/partition_TC8234.h **** //     <o>End Address <0x1F-0xFFFFFFFF>
+ 153:../system/include/DEVICE/partition_TC8234.h **** */
+ 154:../system/include/DEVICE/partition_TC8234.h **** #define SAU_INIT_END4       0x5FFFFFFF      /* end address of SAU region 4 */
+ 155:../system/include/DEVICE/partition_TC8234.h **** 
+ 156:../system/include/DEVICE/partition_TC8234.h **** /*
+ 157:../system/include/DEVICE/partition_TC8234.h **** //     <o>Region is
+ 158:../system/include/DEVICE/partition_TC8234.h **** //         <0=>Non-Secure
+ 159:../system/include/DEVICE/partition_TC8234.h **** //         <1=>Secure, Non-Secure Callable
+ 160:../system/include/DEVICE/partition_TC8234.h **** */
+ 161:../system/include/DEVICE/partition_TC8234.h **** #define SAU_INIT_NSC4       0
+ 162:../system/include/DEVICE/partition_TC8234.h **** /*
+ 163:../system/include/DEVICE/partition_TC8234.h **** //   </e>
+ 164:../system/include/DEVICE/partition_TC8234.h **** */
+ 165:../system/include/DEVICE/partition_TC8234.h **** 
+ 166:../system/include/DEVICE/partition_TC8234.h **** /*
+ 167:../system/include/DEVICE/partition_TC8234.h **** //   <e>SAU Region 5
+ 168:../system/include/DEVICE/partition_TC8234.h **** //   <i> Setup SAU Region 5
+ 169:../system/include/DEVICE/partition_TC8234.h **** */
+ 170:../system/include/DEVICE/partition_TC8234.h **** #define SAU_INIT_REGION5    1
+ 171:../system/include/DEVICE/partition_TC8234.h **** 
+ 172:../system/include/DEVICE/partition_TC8234.h **** /*
+ 173:../system/include/DEVICE/partition_TC8234.h **** //     <o>Start Address <0-0xFFFFFFE0>
+ 174:../system/include/DEVICE/partition_TC8234.h **** */
+ 175:../system/include/DEVICE/partition_TC8234.h **** #define SAU_INIT_START5     0x00807C00
+ 176:../system/include/DEVICE/partition_TC8234.h **** 
+ 177:../system/include/DEVICE/partition_TC8234.h **** /*
+ 178:../system/include/DEVICE/partition_TC8234.h **** //     <o>End Address <0x1F-0xFFFFFFFF>
+ 179:../system/include/DEVICE/partition_TC8234.h **** */
+ 180:../system/include/DEVICE/partition_TC8234.h **** #define SAU_INIT_END5       0x00807FFF
+ 181:../system/include/DEVICE/partition_TC8234.h **** 
+ 182:../system/include/DEVICE/partition_TC8234.h **** /*
+ 183:../system/include/DEVICE/partition_TC8234.h **** //     <o>Region is
+ 184:../system/include/DEVICE/partition_TC8234.h **** //         <0=>Non-Secure
+ 185:../system/include/DEVICE/partition_TC8234.h **** //         <1=>Secure, Non-Secure Callable
+ 186:../system/include/DEVICE/partition_TC8234.h **** */
+ 187:../system/include/DEVICE/partition_TC8234.h **** #define SAU_INIT_NSC5       1
+ 188:../system/include/DEVICE/partition_TC8234.h **** /*
+ 189:../system/include/DEVICE/partition_TC8234.h **** //   </e>
+ 190:../system/include/DEVICE/partition_TC8234.h **** */
+ 191:../system/include/DEVICE/partition_TC8234.h **** 
+ 192:../system/include/DEVICE/partition_TC8234.h **** /*
+ 193:../system/include/DEVICE/partition_TC8234.h **** //   <e>SAU Region 6
+ 194:../system/include/DEVICE/partition_TC8234.h **** //   <i> Setup SAU Region 6
+ 195:../system/include/DEVICE/partition_TC8234.h **** */
+ 196:../system/include/DEVICE/partition_TC8234.h **** #define SAU_INIT_REGION6    0
+ 197:../system/include/DEVICE/partition_TC8234.h **** 
+ 198:../system/include/DEVICE/partition_TC8234.h **** /*
+ 199:../system/include/DEVICE/partition_TC8234.h **** //     <o>Start Address <0-0xFFFFFFE0>
+ 200:../system/include/DEVICE/partition_TC8234.h **** */
+ 201:../system/include/DEVICE/partition_TC8234.h **** #define SAU_INIT_START6     0x00000000
+ 202:../system/include/DEVICE/partition_TC8234.h **** 
+ 203:../system/include/DEVICE/partition_TC8234.h **** /*
+ 204:../system/include/DEVICE/partition_TC8234.h **** //     <o>End Address <0x1F-0xFFFFFFFF>
+ 205:../system/include/DEVICE/partition_TC8234.h **** */
+ 206:../system/include/DEVICE/partition_TC8234.h **** #define SAU_INIT_END6       0x00000000
+ 207:../system/include/DEVICE/partition_TC8234.h **** 
+ 208:../system/include/DEVICE/partition_TC8234.h **** /*
+ 209:../system/include/DEVICE/partition_TC8234.h **** //     <o>Region is
+ 210:../system/include/DEVICE/partition_TC8234.h **** //         <0=>Non-Secure
+ 211:../system/include/DEVICE/partition_TC8234.h **** //         <1=>Secure, Non-Secure Callable
+ 212:../system/include/DEVICE/partition_TC8234.h **** */
+ 213:../system/include/DEVICE/partition_TC8234.h **** #define SAU_INIT_NSC6       0
+ 214:../system/include/DEVICE/partition_TC8234.h **** /*
+ 215:../system/include/DEVICE/partition_TC8234.h **** //   </e>
+ 216:../system/include/DEVICE/partition_TC8234.h **** */
+ 217:../system/include/DEVICE/partition_TC8234.h **** 
+ 218:../system/include/DEVICE/partition_TC8234.h **** /*
+ 219:../system/include/DEVICE/partition_TC8234.h **** //   <e>SAU Region 7
+ 220:../system/include/DEVICE/partition_TC8234.h **** //   <i> Setup SAU Region 7
+ 221:../system/include/DEVICE/partition_TC8234.h **** */
+ 222:../system/include/DEVICE/partition_TC8234.h **** #define SAU_INIT_REGION7    0
+ 223:../system/include/DEVICE/partition_TC8234.h **** 
+ 224:../system/include/DEVICE/partition_TC8234.h **** /*
+ 225:../system/include/DEVICE/partition_TC8234.h **** //     <o>Start Address <0-0xFFFFFFE0>
+ 226:../system/include/DEVICE/partition_TC8234.h **** */
+ 227:../system/include/DEVICE/partition_TC8234.h **** #define SAU_INIT_START7     0x00000000
+ 228:../system/include/DEVICE/partition_TC8234.h **** 
+ 229:../system/include/DEVICE/partition_TC8234.h **** /*
+ 230:../system/include/DEVICE/partition_TC8234.h **** //     <o>End Address <0x1F-0xFFFFFFFF>
+ 231:../system/include/DEVICE/partition_TC8234.h **** */
+ 232:../system/include/DEVICE/partition_TC8234.h **** #define SAU_INIT_END7       0x00000000
+ 233:../system/include/DEVICE/partition_TC8234.h **** 
+ 234:../system/include/DEVICE/partition_TC8234.h **** /*
+ 235:../system/include/DEVICE/partition_TC8234.h **** //     <o>Region is
+ 236:../system/include/DEVICE/partition_TC8234.h **** //         <0=>Non-Secure
+ 237:../system/include/DEVICE/partition_TC8234.h **** //         <1=>Secure, Non-Secure Callable
+ 238:../system/include/DEVICE/partition_TC8234.h **** */
+ 239:../system/include/DEVICE/partition_TC8234.h **** #define SAU_INIT_NSC7       0
+ 240:../system/include/DEVICE/partition_TC8234.h **** /*
+ 241:../system/include/DEVICE/partition_TC8234.h **** //   </e>
+ 242:../system/include/DEVICE/partition_TC8234.h **** */
+ 243:../system/include/DEVICE/partition_TC8234.h **** 
+ 244:../system/include/DEVICE/partition_TC8234.h **** /*
+ 245:../system/include/DEVICE/partition_TC8234.h **** // </h>
+ 246:../system/include/DEVICE/partition_TC8234.h **** */
+ 247:../system/include/DEVICE/partition_TC8234.h **** 
+ 248:../system/include/DEVICE/partition_TC8234.h **** /*
+ 249:../system/include/DEVICE/partition_TC8234.h **** // <e>Setup behaviour of Sleep and Exception Handling
+ 250:../system/include/DEVICE/partition_TC8234.h **** */
+ 251:../system/include/DEVICE/partition_TC8234.h **** #define SCB_CSR_AIRCR_INIT  1
+ 252:../system/include/DEVICE/partition_TC8234.h **** 
+ 253:../system/include/DEVICE/partition_TC8234.h **** /*
+ 254:../system/include/DEVICE/partition_TC8234.h **** //   <o> Deep Sleep can be enabled by
+ 255:../system/include/DEVICE/partition_TC8234.h **** //     <0=>Secure and Non-Secure state
+ 256:../system/include/DEVICE/partition_TC8234.h **** //     <1=>Secure state only
+ 257:../system/include/DEVICE/partition_TC8234.h **** //   <i> Value for SCB->CSR register bit DEEPSLEEPS
+ 258:../system/include/DEVICE/partition_TC8234.h **** */
+ 259:../system/include/DEVICE/partition_TC8234.h **** #define SCB_CSR_DEEPSLEEPS_VAL  0
+ 260:../system/include/DEVICE/partition_TC8234.h **** 
+ 261:../system/include/DEVICE/partition_TC8234.h **** /*
+ 262:../system/include/DEVICE/partition_TC8234.h **** //   <o>System reset request accessible from
+ 263:../system/include/DEVICE/partition_TC8234.h **** //     <0=> Secure and Non-Secure state
+ 264:../system/include/DEVICE/partition_TC8234.h **** //     <1=> Secure state only
+ 265:../system/include/DEVICE/partition_TC8234.h **** //   <i> Value for SCB->AIRCR register bit SYSRESETREQS
+ 266:../system/include/DEVICE/partition_TC8234.h **** */
+ 267:../system/include/DEVICE/partition_TC8234.h **** #define SCB_AIRCR_SYSRESETREQS_VAL  0
+ 268:../system/include/DEVICE/partition_TC8234.h **** 
+ 269:../system/include/DEVICE/partition_TC8234.h **** /*
+ 270:../system/include/DEVICE/partition_TC8234.h **** //   <o>Priority of Non-Secure exceptions is
+ 271:../system/include/DEVICE/partition_TC8234.h **** //     <0=> Not altered
+ 272:../system/include/DEVICE/partition_TC8234.h **** //     <1=> Lowered to 0x80-0xFF
+ 273:../system/include/DEVICE/partition_TC8234.h **** //   <i> Value for SCB->AIRCR register bit PRIS
+ 274:../system/include/DEVICE/partition_TC8234.h **** */
+ 275:../system/include/DEVICE/partition_TC8234.h **** #define SCB_AIRCR_PRIS_VAL      0
+ 276:../system/include/DEVICE/partition_TC8234.h **** 
+ 277:../system/include/DEVICE/partition_TC8234.h **** /*
+ 278:../system/include/DEVICE/partition_TC8234.h **** //   <o>BusFault, HardFault, and NMI target
+ 279:../system/include/DEVICE/partition_TC8234.h **** //     <0=> Secure state
+ 280:../system/include/DEVICE/partition_TC8234.h **** //     <1=> Non-Secure state
+ 281:../system/include/DEVICE/partition_TC8234.h **** //   <i> Value for SCB->AIRCR register bit BFHFNMINS
+ 282:../system/include/DEVICE/partition_TC8234.h **** */
+ 283:../system/include/DEVICE/partition_TC8234.h **** #define SCB_AIRCR_BFHFNMINS_VAL 1
+ 284:../system/include/DEVICE/partition_TC8234.h **** 
+ 285:../system/include/DEVICE/partition_TC8234.h **** /*
+ 286:../system/include/DEVICE/partition_TC8234.h **** // </e>
+ 287:../system/include/DEVICE/partition_TC8234.h **** */
+ 288:../system/include/DEVICE/partition_TC8234.h **** 
+ 289:../system/include/DEVICE/partition_TC8234.h **** 
+ 290:../system/include/DEVICE/partition_TC8234.h **** /*
+ 291:../system/include/DEVICE/partition_TC8234.h **** // <h>Assign Interrupt to Secure or Non-secure Vector
+ 292:../system/include/DEVICE/partition_TC8234.h **** */
+ 293:../system/include/DEVICE/partition_TC8234.h **** 
+ 294:../system/include/DEVICE/partition_TC8234.h **** /*
+ 295:../system/include/DEVICE/partition_TC8234.h ****     Initialize ITNS 0 (Interrupts 0..31)
+ 296:../system/include/DEVICE/partition_TC8234.h **** */
+ 297:../system/include/DEVICE/partition_TC8234.h **** #define NVIC_INIT_ITNS0    1
+ 298:../system/include/DEVICE/partition_TC8234.h **** /*
+ 299:../system/include/DEVICE/partition_TC8234.h **** // Interrupts 0..31
+ 300:../system/include/DEVICE/partition_TC8234.h **** //   <o.0>  BOD Interrupt         <0=> Secure <1=> Non-Secure
+ 301:../system/include/DEVICE/partition_TC8234.h **** //   <o.1>  IRC Interrupt         <0=> Secure <1=> Non-Secure
+ 302:../system/include/DEVICE/partition_TC8234.h **** //   <o.2>  PWRWU Interrupt       <0=> Secure <1=> Non-Secure
+ 303:../system/include/DEVICE/partition_TC8234.h **** //   <o.3>  SRAM Interrupt        <0=> Secure <1=> Non-Secure
+ 304:../system/include/DEVICE/partition_TC8234.h **** //   <o.4>  CLKFAIL Interrupt     <0=> Secure <1=> Non-Secure
+ 305:../system/include/DEVICE/partition_TC8234.h **** //
+ 306:../system/include/DEVICE/partition_TC8234.h **** //   <o.6>  RTC Interrupt         <0=> Secure <1=> Non-Secure
+ 307:../system/include/DEVICE/partition_TC8234.h **** //   <o.7>  TAMPER Interrupt      <0=> Secure <1=> Non-Secure
+ 308:../system/include/DEVICE/partition_TC8234.h **** //   <o.8>  WDT Interrupt         <0=> Secure <1=> Non-Secure
+ 309:../system/include/DEVICE/partition_TC8234.h **** //   <o.9>  WWDT Interrupt        <0=> Secure <1=> Non-Secure
+ 310:../system/include/DEVICE/partition_TC8234.h **** //   <o.10> EINT0 Interrupt       <0=> Secure <1=> Non-Secure
+ 311:../system/include/DEVICE/partition_TC8234.h **** //   <o.11> EINT1 Interrupt       <0=> Secure <1=> Non-Secure
+ 312:../system/include/DEVICE/partition_TC8234.h **** //   <o.12> EINT2 Interrupt       <0=> Secure <1=> Non-Secure
+ 313:../system/include/DEVICE/partition_TC8234.h **** //   <o.13> EINT3 Interrupt       <0=> Secure <1=> Non-Secure
+ 314:../system/include/DEVICE/partition_TC8234.h **** //   <o.14> EINT4 Interrupt       <0=> Secure <1=> Non-Secure
+ 315:../system/include/DEVICE/partition_TC8234.h **** //   <o.15> EINT5 Interrupt       <0=> Secure <1=> Non-Secure
+ 316:../system/include/DEVICE/partition_TC8234.h **** //   <o.16> GPA Interrupt         <0=> Secure <1=> Non-Secure
+ 317:../system/include/DEVICE/partition_TC8234.h **** //   <o.17> GPB Interrupt         <0=> Secure <1=> Non-Secure
+ 318:../system/include/DEVICE/partition_TC8234.h **** //   <o.18> GPC Interrupt         <0=> Secure <1=> Non-Secure
+ 319:../system/include/DEVICE/partition_TC8234.h **** //   <o.19> GPD Interrupt         <0=> Secure <1=> Non-Secure
+ 320:../system/include/DEVICE/partition_TC8234.h **** //   <o.20> GPE Interrupt         <0=> Secure <1=> Non-Secure
+ 321:../system/include/DEVICE/partition_TC8234.h **** //   <o.21> GPF Interrupt         <0=> Secure <1=> Non-Secure
+ 322:../system/include/DEVICE/partition_TC8234.h **** //   <o.22> SPI0 Interrupt        <0=> Secure <1=> Non-Secure
+ 323:../system/include/DEVICE/partition_TC8234.h **** //   <o.23> SPI1 Interrupt        <0=> Secure <1=> Non-Secure
+ 324:../system/include/DEVICE/partition_TC8234.h **** //   <o.24> BRAKE0 Interrupt      <0=> Secure <1=> Non-Secure
+ 325:../system/include/DEVICE/partition_TC8234.h **** //   <o.25> PWM0_P0 Interrupt     <0=> Secure <1=> Non-Secure
+ 326:../system/include/DEVICE/partition_TC8234.h **** //   <o.26> PWM0_P1 Interrupt     <0=> Secure <1=> Non-Secure
+ 327:../system/include/DEVICE/partition_TC8234.h **** //   <o.27> PWM0_P2 Interrupt     <0=> Secure <1=> Non-Secure
+ 328:../system/include/DEVICE/partition_TC8234.h **** //   <o.28> BRAKE1 Interrupt      <0=> Secure <1=> Non-Secure
+ 329:../system/include/DEVICE/partition_TC8234.h **** //   <o.29> PWM1_P0 Interrupt     <0=> Secure <1=> Non-Secure
+ 330:../system/include/DEVICE/partition_TC8234.h **** //   <o.30> PWM1_P1 Interrupt     <0=> Secure <1=> Non-Secure
+ 331:../system/include/DEVICE/partition_TC8234.h **** //   <o.31> PWM1_P2 Interrupt     <0=> Secure <1=> Non-Secure
+ 332:../system/include/DEVICE/partition_TC8234.h **** */
+ 333:../system/include/DEVICE/partition_TC8234.h **** #define NVIC_INIT_ITNS0_VAL      0x00000000
+ 334:../system/include/DEVICE/partition_TC8234.h **** 
+ 335:../system/include/DEVICE/partition_TC8234.h **** 
+ 336:../system/include/DEVICE/partition_TC8234.h **** /*
+ 337:../system/include/DEVICE/partition_TC8234.h ****     Initialize ITNS 1 (Interrupts 32..63)
+ 338:../system/include/DEVICE/partition_TC8234.h **** */
+ 339:../system/include/DEVICE/partition_TC8234.h **** 
+ 340:../system/include/DEVICE/partition_TC8234.h **** #define NVIC_INIT_ITNS1    1
+ 341:../system/include/DEVICE/partition_TC8234.h **** 
+ 342:../system/include/DEVICE/partition_TC8234.h **** /*
+ 343:../system/include/DEVICE/partition_TC8234.h **** // Interrupts 32..63
+ 344:../system/include/DEVICE/partition_TC8234.h **** //   <o.0>  TMR0 Interrupt   <0=> Secure <1=> Non-Secure
+ 345:../system/include/DEVICE/partition_TC8234.h **** //   <o.1>  TMR1 Interrupt   <0=> Secure <1=> Non-Secure
+ 346:../system/include/DEVICE/partition_TC8234.h **** //   <o.2>  TMR2 Interrupt   <0=> Secure <1=> Non-Secure
+ 347:../system/include/DEVICE/partition_TC8234.h **** //   <o.3>  TMR3 Interrupt   <0=> Secure <1=> Non-Secure
+ 348:../system/include/DEVICE/partition_TC8234.h **** //   <o.4>  UART0 Interrupt  <0=> Secure <1=> Non-Secure
+ 349:../system/include/DEVICE/partition_TC8234.h **** //   <o.5>  UART1 Interrupt  <0=> Secure <1=> Non-Secure
+ 350:../system/include/DEVICE/partition_TC8234.h **** //   <o.6>  I2C0 Interrupt   <0=> Secure <1=> Non-Secure
+ 351:../system/include/DEVICE/partition_TC8234.h **** //   <o.7>  I2C1 Interrupt   <0=> Secure <1=> Non-Secure
+ 352:../system/include/DEVICE/partition_TC8234.h **** //   <o.8>  PDMA Interrupt   <0=> Secure <1=> Non-Secure
+ 353:../system/include/DEVICE/partition_TC8234.h **** //   <o.9> DAC Interrupt    <0=> Secure <1=> Non-Secure
+ 354:../system/include/DEVICE/partition_TC8234.h **** //   <o.10> EADC0 Interrupt  <0=> Secure <1=> Non-Secure
+ 355:../system/include/DEVICE/partition_TC8234.h **** //   <o.11> EADC1 Interrupt  <0=> Secure <1=> Non-Secure
+ 356:../system/include/DEVICE/partition_TC8234.h **** //   <o.12> ACMP01 Interrupt <0=> Secure <1=> Non-Secure
+ 357:../system/include/DEVICE/partition_TC8234.h **** //
+ 358:../system/include/DEVICE/partition_TC8234.h **** //   <o.14> EADC2 Interrupt  <0=> Secure <1=> Non-Secure
+ 359:../system/include/DEVICE/partition_TC8234.h **** //   <o.15> EADC3 Interrupt  <0=> Secure <1=> Non-Secure
+ 360:../system/include/DEVICE/partition_TC8234.h **** //   <o.16> UART2 Interrupt  <0=> Secure <1=> Non-Secure
+ 361:../system/include/DEVICE/partition_TC8234.h **** //   <o.17> UART3 Interrupt  <0=> Secure <1=> Non-Secure
+ 362:../system/include/DEVICE/partition_TC8234.h **** //
+ 363:../system/include/DEVICE/partition_TC8234.h **** //   <o.19> SPI2 Interrupt   <0=> Secure <1=> Non-Secure
+ 364:../system/include/DEVICE/partition_TC8234.h **** //   <o.20> SPI3 Interrupt   <0=> Secure <1=> Non-Secure
+ 365:../system/include/DEVICE/partition_TC8234.h **** //   <o.21> USBD Interrupt   <0=> Secure <1=> Non-Secure
+ 366:../system/include/DEVICE/partition_TC8234.h **** //   <o.22> USBH Interrupt   <0=> Secure <1=> Non-Secure
+ 367:../system/include/DEVICE/partition_TC8234.h **** //   <o.23> OTG Interrupt    <0=> Secure <1=> Non-Secure
+ 368:../system/include/DEVICE/partition_TC8234.h **** //   <o.24> CAN0 Interrupt   <0=> Secure <1=> Non-Secure
+ 369:../system/include/DEVICE/partition_TC8234.h **** //   <o.25> CAN1 Interrupt   <0=> Secure <1=> Non-Secure
+ 370:../system/include/DEVICE/partition_TC8234.h **** //   <o.26> SC0 Interrupt    <0=> Secure <1=> Non-Secure
+ 371:../system/include/DEVICE/partition_TC8234.h **** //   <o.27> SC1 Interrupt    <0=> Secure <1=> Non-Secure
+ 372:../system/include/DEVICE/partition_TC8234.h **** //   <o.28> SC2 Interrupt    <0=> Secure <1=> Non-Secure
+ 373:../system/include/DEVICE/partition_TC8234.h **** //   <o.29> SC3 Interrupt    <0=> Secure <1=> Non-Secure
+ 374:../system/include/DEVICE/partition_TC8234.h **** //   <o.30> SPI4 Interrupt   <0=> Secure <1=> Non-Secure
+ 375:../system/include/DEVICE/partition_TC8234.h **** //   <o.31> SD0 Interrupt    <0=> Secure <1=> Non-Secure
+ 376:../system/include/DEVICE/partition_TC8234.h **** */
+ 377:../system/include/DEVICE/partition_TC8234.h **** #define NVIC_INIT_ITNS1_VAL      0x00000000
+ 378:../system/include/DEVICE/partition_TC8234.h **** 
+ 379:../system/include/DEVICE/partition_TC8234.h **** 
+ 380:../system/include/DEVICE/partition_TC8234.h **** /*
+ 381:../system/include/DEVICE/partition_TC8234.h ****     Initialize ITNS 2 (Interrupts 64..95)
+ 382:../system/include/DEVICE/partition_TC8234.h **** */
+ 383:../system/include/DEVICE/partition_TC8234.h **** 
+ 384:../system/include/DEVICE/partition_TC8234.h **** #define NVIC_INIT_ITNS2    1
+ 385:../system/include/DEVICE/partition_TC8234.h **** /*
+ 386:../system/include/DEVICE/partition_TC8234.h **** //
+ 387:../system/include/DEVICE/partition_TC8234.h **** //   <o.1>  USBD Interrupt   <0=> Secure <1=> Non-Secure
+ 388:../system/include/DEVICE/partition_TC8234.h **** //
+ 389:../system/include/DEVICE/partition_TC8234.h **** //
+ 390:../system/include/DEVICE/partition_TC8234.h **** //   <o.4>  I2S0 Interrupt   <0=> Secure <1=> Non-Secure
+ 391:../system/include/DEVICE/partition_TC8234.h **** //
+ 392:../system/include/DEVICE/partition_TC8234.h **** //   <o.6>  OPA0 Interrupt   <0=> Secure <1=> Non-Secure
+ 393:../system/include/DEVICE/partition_TC8234.h **** //   <o.7>  CRPT Interrupt   <0=> Secure <1=> Non-Secure
+ 394:../system/include/DEVICE/partition_TC8234.h **** //   <o.8> GPG Interrupt    <0=> Secure <1=> Non-Secure
+ 395:../system/include/DEVICE/partition_TC8234.h **** //   <o.9> EINT6 Interrupt  <0=> Secure <1=> Non-Secure
+ 396:../system/include/DEVICE/partition_TC8234.h **** //   <o.10> UART4 Interrupt  <0=> Secure <1=> Non-Secure
+ 397:../system/include/DEVICE/partition_TC8234.h **** //   <o.11> UART5 Interrupt  <0=> Secure <1=> Non-Secure
+ 398:../system/include/DEVICE/partition_TC8234.h **** //   <o.12> USCI0 Interrupt  <0=> Secure <1=> Non-Secure
+ 399:../system/include/DEVICE/partition_TC8234.h **** //   <o.13> USCI1 Interrupt  <0=> Secure <1=> Non-Secure
+ 400:../system/include/DEVICE/partition_TC8234.h **** //   <o.14> BPWM0 Interrupt  <0=> Secure <1=> Non-Secure
+ 401:../system/include/DEVICE/partition_TC8234.h **** //   <o.15> BPWM1 Interrupt  <0=> Secure <1=> Non-Secure
+ 402:../system/include/DEVICE/partition_TC8234.h **** //
+ 403:../system/include/DEVICE/partition_TC8234.h **** //
+ 404:../system/include/DEVICE/partition_TC8234.h **** //   <o.18> I2C2 Interrupt   <0=> Secure <1=> Non-Secure
+ 405:../system/include/DEVICE/partition_TC8234.h **** //
+ 406:../system/include/DEVICE/partition_TC8234.h **** //   <o.20> QEI0 Interrupt   <0=> Secure <1=> Non-Secure
+ 407:../system/include/DEVICE/partition_TC8234.h **** //   <o.21> QEI1 Interrupt   <0=> Secure <1=> Non-Secure
+ 408:../system/include/DEVICE/partition_TC8234.h **** //   <o.22> ECAP0 Interrupt  <0=> Secure <1=> Non-Secure
+ 409:../system/include/DEVICE/partition_TC8234.h **** //   <o.23> ECAP1 Interrupt  <0=> Secure <1=> Non-Secure
+ 410:../system/include/DEVICE/partition_TC8234.h **** //   <o.24> GPH Interrupt    <0=> Secure <1=> Non-Secure
+ 411:../system/include/DEVICE/partition_TC8234.h **** //   <o.25> EINT7 Interrupt  <0=> Secure <1=> Non-Secure
+ 412:../system/include/DEVICE/partition_TC8234.h **** //   <o.26> SD1 Interrupt    <0=> Secure <1=> Non-Secure
+ 413:../system/include/DEVICE/partition_TC8234.h **** //
+ 414:../system/include/DEVICE/partition_TC8234.h **** //
+ 415:../system/include/DEVICE/partition_TC8234.h **** //
+ 416:../system/include/DEVICE/partition_TC8234.h **** //   <o.30> SWDC Interrupt   <0=> Secure <1=> Non-Secure
+ 417:../system/include/DEVICE/partition_TC8234.h **** //   <o.31> ETMC Interrupt   <0=> Secure <1=> Non-Secure
+ 418:../system/include/DEVICE/partition_TC8234.h **** */
+ 419:../system/include/DEVICE/partition_TC8234.h **** #define NVIC_INIT_ITNS2_VAL      0x00000000
+ 420:../system/include/DEVICE/partition_TC8234.h **** 
+ 421:../system/include/DEVICE/partition_TC8234.h **** 
+ 422:../system/include/DEVICE/partition_TC8234.h **** 
+ 423:../system/include/DEVICE/partition_TC8234.h **** /*
+ 424:../system/include/DEVICE/partition_TC8234.h **** // </h>
+ 425:../system/include/DEVICE/partition_TC8234.h **** */
+ 426:../system/include/DEVICE/partition_TC8234.h **** 
+ 427:../system/include/DEVICE/partition_TC8234.h **** 
+ 428:../system/include/DEVICE/partition_TC8234.h **** 
+ 429:../system/include/DEVICE/partition_TC8234.h **** /*
+ 430:../system/include/DEVICE/partition_TC8234.h ****     max 128 SAU regions.
+ 431:../system/include/DEVICE/partition_TC8234.h ****     SAU regions are defined in partition.h
+ 432:../system/include/DEVICE/partition_TC8234.h ****  */
+ 433:../system/include/DEVICE/partition_TC8234.h **** 
+ 434:../system/include/DEVICE/partition_TC8234.h **** #define SAU_INIT_REGION(n) \
+ 435:../system/include/DEVICE/partition_TC8234.h ****     SAU->RNR  =  (n                                     & SAU_RNR_REGION_Msk); \
+ 436:../system/include/DEVICE/partition_TC8234.h ****     SAU->RBAR =  (SAU_INIT_START##n                     & SAU_RBAR_BADDR_Msk); \
+ 437:../system/include/DEVICE/partition_TC8234.h ****     SAU->RLAR =  (SAU_INIT_END##n                       & SAU_RLAR_LADDR_Msk) | \
+ 438:../system/include/DEVICE/partition_TC8234.h ****                 ((SAU_INIT_NSC##n << SAU_RLAR_NSC_Pos)  & SAU_RLAR_NSC_Msk)   | 1U
+ 439:../system/include/DEVICE/partition_TC8234.h **** 
+ 440:../system/include/DEVICE/partition_TC8234.h **** /**
+ 441:../system/include/DEVICE/partition_TC8234.h ****   \brief   Setup a SAU Region
+ 442:../system/include/DEVICE/partition_TC8234.h ****   \details Writes the region information contained in SAU_Region to the
+ 443:../system/include/DEVICE/partition_TC8234.h ****            registers SAU_RNR, SAU_RBAR, and SAU_RLAR
+ 444:../system/include/DEVICE/partition_TC8234.h ****  */
+ 445:../system/include/DEVICE/partition_TC8234.h **** __STATIC_INLINE void TZ_SAU_Setup(void)
+ 446:../system/include/DEVICE/partition_TC8234.h **** {
+  25              		.loc 1 446 0
+  26              		.cfi_startproc
+  27              		@ args = 0, pretend = 0, frame = 0
+  28              		@ frame_needed = 1, uses_anonymous_args = 0
+  29 0000 80B5     		push	{r7, lr}
+  30              	.LCFI0:
+  31              		.cfi_def_cfa_offset 8
+  32              		.cfi_offset 7, -8
+  33              		.cfi_offset 14, -4
+  34 0002 00AF     		add	r7, sp, #0
+  35              	.LCFI1:
+  36              		.cfi_def_cfa_register 7
+ 447:../system/include/DEVICE/partition_TC8234.h **** 
+ 448:../system/include/DEVICE/partition_TC8234.h **** #if defined (__SAUREGION_PRESENT) && (__SAUREGION_PRESENT == 1U)
+ 449:../system/include/DEVICE/partition_TC8234.h **** 
+ 450:../system/include/DEVICE/partition_TC8234.h **** #if defined (SAU_INIT_REGION0) && (SAU_INIT_REGION0 == 1U)
+ 451:../system/include/DEVICE/partition_TC8234.h ****     SAU_INIT_REGION(0);
+  37              		.loc 1 451 0
+  38 0004 2D4B     		ldr	r3, .L2
+  39 0006 0022     		movs	r2, #0
+  40 0008 9A60     		str	r2, [r3, #8]
+  41 000a 2C4B     		ldr	r3, .L2
+  42 000c 0022     		movs	r2, #0
+  43 000e DA60     		str	r2, [r3, #12]
+  44 0010 2A4B     		ldr	r3, .L2
+  45 0012 2B4A     		ldr	r2, .L2+4
+  46 0014 1A61     		str	r2, [r3, #16]
+ 452:../system/include/DEVICE/partition_TC8234.h **** #endif
+ 453:../system/include/DEVICE/partition_TC8234.h **** 
+ 454:../system/include/DEVICE/partition_TC8234.h **** #if defined (SAU_INIT_REGION1) && (SAU_INIT_REGION1 == 1U)
+ 455:../system/include/DEVICE/partition_TC8234.h ****     SAU_INIT_REGION(1);
+  47              		.loc 1 455 0
+  48 0016 294B     		ldr	r3, .L2
+  49 0018 0122     		movs	r2, #1
+  50 001a 9A60     		str	r2, [r3, #8]
+  51 001c 274B     		ldr	r3, .L2
+  52 001e 294A     		ldr	r2, .L2+8
+  53 0020 DA60     		str	r2, [r3, #12]
+  54 0022 264B     		ldr	r3, .L2
+  55 0024 284A     		ldr	r2, .L2+12
+  56 0026 1A61     		str	r2, [r3, #16]
+ 456:../system/include/DEVICE/partition_TC8234.h **** #endif
+ 457:../system/include/DEVICE/partition_TC8234.h **** 
+ 458:../system/include/DEVICE/partition_TC8234.h **** #if defined (SAU_INIT_REGION2) && (SAU_INIT_REGION2 == 1U)
+ 459:../system/include/DEVICE/partition_TC8234.h ****     SAU_INIT_REGION(2);
+  57              		.loc 1 459 0
+  58 0028 244B     		ldr	r3, .L2
+  59 002a 0222     		movs	r2, #2
+  60 002c 9A60     		str	r2, [r3, #8]
+  61 002e 234B     		ldr	r3, .L2
+  62 0030 264A     		ldr	r2, .L2+16
+  63 0032 DA60     		str	r2, [r3, #12]
+  64 0034 214B     		ldr	r3, .L2
+  65 0036 264A     		ldr	r2, .L2+20
+  66 0038 1A61     		str	r2, [r3, #16]
+ 460:../system/include/DEVICE/partition_TC8234.h **** #endif
+ 461:../system/include/DEVICE/partition_TC8234.h **** 
+ 462:../system/include/DEVICE/partition_TC8234.h **** #if defined (SAU_INIT_REGION3) && (SAU_INIT_REGION3 == 1U)
+ 463:../system/include/DEVICE/partition_TC8234.h ****     SAU_INIT_REGION(3);
+  67              		.loc 1 463 0
+  68 003a 204B     		ldr	r3, .L2
+  69 003c 0322     		movs	r2, #3
+  70 003e 9A60     		str	r2, [r3, #8]
+  71 0040 1E4B     		ldr	r3, .L2
+  72 0042 244A     		ldr	r2, .L2+24
+  73 0044 DA60     		str	r2, [r3, #12]
+  74 0046 1D4B     		ldr	r3, .L2
+  75 0048 234A     		ldr	r2, .L2+28
+  76 004a 1A61     		str	r2, [r3, #16]
+ 464:../system/include/DEVICE/partition_TC8234.h **** #endif
+ 465:../system/include/DEVICE/partition_TC8234.h **** 
+ 466:../system/include/DEVICE/partition_TC8234.h **** #if defined (SAU_INIT_REGION4) && (SAU_INIT_REGION4 == 1U)
+ 467:../system/include/DEVICE/partition_TC8234.h ****     SAU_INIT_REGION(4);
+  77              		.loc 1 467 0
+  78 004c 1B4B     		ldr	r3, .L2
+  79 004e 0422     		movs	r2, #4
+  80 0050 9A60     		str	r2, [r3, #8]
+  81 0052 1A4B     		ldr	r3, .L2
+  82 0054 A022     		movs	r2, #160
+  83 0056 D205     		lsls	r2, r2, #23
+  84 0058 DA60     		str	r2, [r3, #12]
+  85 005a 184B     		ldr	r3, .L2
+  86 005c 1F4A     		ldr	r2, .L2+32
+  87 005e 1A61     		str	r2, [r3, #16]
+ 468:../system/include/DEVICE/partition_TC8234.h **** #endif
+ 469:../system/include/DEVICE/partition_TC8234.h **** 
+ 470:../system/include/DEVICE/partition_TC8234.h **** #if defined (SAU_INIT_REGION5) && (SAU_INIT_REGION5 == 1U)
+ 471:../system/include/DEVICE/partition_TC8234.h ****     SAU_INIT_REGION(5);
+  88              		.loc 1 471 0
+  89 0060 164B     		ldr	r3, .L2
+  90 0062 0522     		movs	r2, #5
+  91 0064 9A60     		str	r2, [r3, #8]
+  92 0066 154B     		ldr	r3, .L2
+  93 0068 1D4A     		ldr	r2, .L2+36
+  94 006a DA60     		str	r2, [r3, #12]
+  95 006c 134B     		ldr	r3, .L2
+  96 006e 1D4A     		ldr	r2, .L2+40
+  97 0070 1A61     		str	r2, [r3, #16]
+ 472:../system/include/DEVICE/partition_TC8234.h **** #endif
+ 473:../system/include/DEVICE/partition_TC8234.h **** 
+ 474:../system/include/DEVICE/partition_TC8234.h **** #if defined (SAU_INIT_REGION6) && (SAU_INIT_REGION6 == 1U)
+ 475:../system/include/DEVICE/partition_TC8234.h ****     SAU_INIT_REGION(6);
+ 476:../system/include/DEVICE/partition_TC8234.h **** #endif
+ 477:../system/include/DEVICE/partition_TC8234.h **** 
+ 478:../system/include/DEVICE/partition_TC8234.h **** #if defined (SAU_INIT_REGION7) && (SAU_INIT_REGION7 == 1U)
+ 479:../system/include/DEVICE/partition_TC8234.h ****     SAU_INIT_REGION(7);
+ 480:../system/include/DEVICE/partition_TC8234.h **** #endif
+ 481:../system/include/DEVICE/partition_TC8234.h **** 
+ 482:../system/include/DEVICE/partition_TC8234.h ****     /* repeat this for all possible SAU regions */
+ 483:../system/include/DEVICE/partition_TC8234.h **** 
+ 484:../system/include/DEVICE/partition_TC8234.h **** 
+ 485:../system/include/DEVICE/partition_TC8234.h **** #if defined (SAU_INIT_CTRL) && (SAU_INIT_CTRL == 1U)
+ 486:../system/include/DEVICE/partition_TC8234.h ****     SAU->CTRL = ((SAU_INIT_CTRL_ENABLE << SAU_CTRL_ENABLE_Pos) & SAU_CTRL_ENABLE_Msk) |
+  98              		.loc 1 486 0
+  99 0072 124B     		ldr	r3, .L2
+ 100 0074 0122     		movs	r2, #1
+ 101 0076 1A60     		str	r2, [r3]
+ 487:../system/include/DEVICE/partition_TC8234.h ****                 ((SAU_INIT_CTRL_ALLNS  << SAU_CTRL_ALLNS_Pos)  & SAU_CTRL_ALLNS_Msk)   ;
+ 488:../system/include/DEVICE/partition_TC8234.h **** #endif
+ 489:../system/include/DEVICE/partition_TC8234.h **** 
+ 490:../system/include/DEVICE/partition_TC8234.h **** #endif /* defined (__SAUREGION_PRESENT) && (__SAUREGION_PRESENT == 1U) */
+ 491:../system/include/DEVICE/partition_TC8234.h **** 
+ 492:../system/include/DEVICE/partition_TC8234.h **** #if defined (SCB_CSR_AIRCR_INIT) && (SCB_CSR_AIRCR_INIT == 1U)
+ 493:../system/include/DEVICE/partition_TC8234.h ****     SCB->SCR   = (SCB->SCR   & ~(SCB_SCR_SLEEPDEEPS_Msk)) |
+ 102              		.loc 1 493 0
+ 103 0078 1B4B     		ldr	r3, .L2+44
+ 104 007a 1B4A     		ldr	r2, .L2+44
+ 105 007c 1269     		ldr	r2, [r2, #16]
+ 106 007e 0821     		movs	r1, #8
+ 107 0080 8A43     		bics	r2, r1
+ 108 0082 1A61     		str	r2, [r3, #16]
+ 494:../system/include/DEVICE/partition_TC8234.h ****                  ((SCB_CSR_DEEPSLEEPS_VAL     << SCB_SCR_SLEEPDEEPS_Pos)     & SCB_SCR_SLEEPDEEPS_M
+ 495:../system/include/DEVICE/partition_TC8234.h **** 
+ 496:../system/include/DEVICE/partition_TC8234.h ****     SCB->AIRCR = (SCB->AIRCR & ~(SCB_AIRCR_SYSRESETREQS_Msk | SCB_AIRCR_BFHFNMINS_Pos |  SCB_AIRCR_
+ 109              		.loc 1 496 0
+ 110 0084 184B     		ldr	r3, .L2+44
+ 111 0086 184A     		ldr	r2, .L2+44
+ 112 0088 D268     		ldr	r2, [r2, #12]
+ 497:../system/include/DEVICE/partition_TC8234.h ****                  ((SCB_AIRCR_SYSRESETREQS_VAL << SCB_AIRCR_SYSRESETREQS_Pos) & SCB_AIRCR_SYSRESETRE
+ 113              		.loc 1 497 0
+ 114 008a 1849     		ldr	r1, .L2+48
+ 115 008c 0A40     		ands	r2, r1
+ 498:../system/include/DEVICE/partition_TC8234.h ****                  ((SCB_AIRCR_PRIS_VAL         << SCB_AIRCR_BFHFNMINS_Pos)    & SCB_AIRCR_BFHFNMINS_
+ 116              		.loc 1 498 0
+ 117 008e 44F20001 		movw	r1, #16384
+ 118 0092 0A43     		orrs	r2, r1
+ 496:../system/include/DEVICE/partition_TC8234.h ****                  ((SCB_AIRCR_SYSRESETREQS_VAL << SCB_AIRCR_SYSRESETREQS_Pos) & SCB_AIRCR_SYSRESETRE
+ 119              		.loc 1 496 0
+ 120 0094 DA60     		str	r2, [r3, #12]
+ 499:../system/include/DEVICE/partition_TC8234.h ****                  ((SCB_AIRCR_BFHFNMINS_VAL    << SCB_AIRCR_PRIS_Pos)         & SCB_AIRCR_PRIS_Msk);
+ 500:../system/include/DEVICE/partition_TC8234.h **** #endif /* defined (SCB_CSR_AIRCR_INIT) && (SCB_CSR_AIRCR_INIT == 1U) */
+ 501:../system/include/DEVICE/partition_TC8234.h **** 
+ 502:../system/include/DEVICE/partition_TC8234.h **** #if defined (SCB_ICSR_INIT) && (SCB_ICSR_INIT == 1U)
+ 503:../system/include/DEVICE/partition_TC8234.h ****     SCB->ICSR  = (SCB->ICSR  & ~(SCB_ICSR_STTNS_Msk)) |
+ 504:../system/include/DEVICE/partition_TC8234.h ****                  ((SCB_ICSR_STTNS_VAL         << SCB_ICSR_STTNS_Pos)         & SCB_ICSR_STTNS_Msk);
+ 505:../system/include/DEVICE/partition_TC8234.h **** #endif /* defined (SCB_ICSR_INIT) && (SCB_ICSR_INIT == 1U) */
+ 506:../system/include/DEVICE/partition_TC8234.h **** 
+ 507:../system/include/DEVICE/partition_TC8234.h **** #if defined (NVIC_INIT_ITNS0) && (NVIC_INIT_ITNS0 == 1U)
+ 508:../system/include/DEVICE/partition_TC8234.h ****     NVIC->ITNS[0] = NVIC_INIT_ITNS0_VAL;
+ 121              		.loc 1 508 0
+ 122 0096 164A     		ldr	r2, .L2+52
+ 123 0098 40F28023 		movw	r3, #640
+ 124 009c 0021     		movs	r1, #0
+ 125 009e D150     		str	r1, [r2, r3]
+ 509:../system/include/DEVICE/partition_TC8234.h **** #endif
+ 510:../system/include/DEVICE/partition_TC8234.h **** 
+ 511:../system/include/DEVICE/partition_TC8234.h **** #if defined (NVIC_INIT_ITNS1) && (NVIC_INIT_ITNS1 == 1U)
+ 512:../system/include/DEVICE/partition_TC8234.h ****     NVIC->ITNS[1] = NVIC_INIT_ITNS1_VAL;
+ 126              		.loc 1 512 0
+ 127 00a0 134A     		ldr	r2, .L2+52
+ 128 00a2 40F28423 		movw	r3, #644
+ 129 00a6 0021     		movs	r1, #0
+ 130 00a8 D150     		str	r1, [r2, r3]
+ 513:../system/include/DEVICE/partition_TC8234.h **** #endif
+ 514:../system/include/DEVICE/partition_TC8234.h **** 
+ 515:../system/include/DEVICE/partition_TC8234.h **** #if defined (NVIC_INIT_ITNS2) && (NVIC_INIT_ITNS2 == 1U)
+ 516:../system/include/DEVICE/partition_TC8234.h ****     NVIC->ITNS[2] = NVIC_INIT_ITNS2_VAL;
+ 131              		.loc 1 516 0
+ 132 00aa 114A     		ldr	r2, .L2+52
+ 133 00ac 40F28823 		movw	r3, #648
+ 134 00b0 0021     		movs	r1, #0
+ 135 00b2 D150     		str	r1, [r2, r3]
+ 517:../system/include/DEVICE/partition_TC8234.h **** #endif
+ 518:../system/include/DEVICE/partition_TC8234.h **** 
+ 519:../system/include/DEVICE/partition_TC8234.h **** 
+ 520:../system/include/DEVICE/partition_TC8234.h ****     /* repeat this for all possible ITNS elements */
+ 521:../system/include/DEVICE/partition_TC8234.h **** 
+ 522:../system/include/DEVICE/partition_TC8234.h **** }
+ 136              		.loc 1 522 0
+ 137 00b4 C046     		nop
+ 138 00b6 BD46     		mov	sp, r7
+ 139              		@ sp needed
+ 140 00b8 80BD     		pop	{r7, pc}
+ 141              	.L3:
+ 142 00ba C046     		.align	2
+ 143              	.L2:
+ 144 00bc D0ED00E0 		.word	-536810032
+ 145 00c0 03000400 		.word	262147
+ 146 00c4 00000410 		.word	268697600
+ 147 00c8 E1FF0710 		.word	268959713
+ 148 00cc 00FC0020 		.word	536935424
+ 149 00d0 E3FF0020 		.word	536936419
+ 150 00d4 00000130 		.word	805371904
+ 151 00d8 E1FF0130 		.word	805437409
+ 152 00dc E1FFFF5F 		.word	1610612705
+ 153 00e0 007C8000 		.word	8420352
+ 154 00e4 E37F8000 		.word	8421347
+ 155 00e8 00ED00E0 		.word	-536810240
+ 156 00ec F2BFFFFF 		.word	-16398
+ 157 00f0 00E100E0 		.word	-536813312
+ 158              		.cfi_endproc
+ 159              	.LFE88:
+ 161              		.section	.text.SCU_Setup,"ax",%progbits
+ 162              		.align	1
+ 163              		.syntax unified
+ 164              		.code	16
+ 165              		.thumb_func
+ 166              		.fpu softvfp
+ 168              	SCU_Setup:
+ 169              	.LFB89:
+ 523:../system/include/DEVICE/partition_TC8234.h **** 
+ 524:../system/include/DEVICE/partition_TC8234.h **** 
+ 525:../system/include/DEVICE/partition_TC8234.h **** /*
+ 526:../system/include/DEVICE/partition_TC8234.h **** // <h> Peripheral Secure Attribution Configuration
+ 527:../system/include/DEVICE/partition_TC8234.h **** */
+ 528:../system/include/DEVICE/partition_TC8234.h **** 
+ 529:../system/include/DEVICE/partition_TC8234.h **** /*
+ 530:../system/include/DEVICE/partition_TC8234.h ****     PNSSET0
+ 531:../system/include/DEVICE/partition_TC8234.h **** */
+ 532:../system/include/DEVICE/partition_TC8234.h **** /*
+ 533:../system/include/DEVICE/partition_TC8234.h **** // Module 0..31
+ 534:../system/include/DEVICE/partition_TC8234.h **** //   <o.9>  USBH       <0=> Secure <1=> Non-Secure
+ 535:../system/include/DEVICE/partition_TC8234.h **** //   <o.13>  SD0   <0=> Secure <1=> Non-Secure
+ 536:../system/include/DEVICE/partition_TC8234.h **** //   <o.14>  SD1      <0=> Secure <1=> Non-Secure
+ 537:../system/include/DEVICE/partition_TC8234.h **** //   <o.16>  EBI    <0=> Secure <1=> Non-Secure
+ 538:../system/include/DEVICE/partition_TC8234.h **** //   <o.24>  PDMA1      <0=> Secure <1=> Non-Secure
+ 539:../system/include/DEVICE/partition_TC8234.h **** */
+ 540:../system/include/DEVICE/partition_TC8234.h **** #define SCU_INIT_PNSSET0_VAL      0x00000001
+ 541:../system/include/DEVICE/partition_TC8234.h **** /*
+ 542:../system/include/DEVICE/partition_TC8234.h ****     PNSSET1
+ 543:../system/include/DEVICE/partition_TC8234.h **** */
+ 544:../system/include/DEVICE/partition_TC8234.h **** /*
+ 545:../system/include/DEVICE/partition_TC8234.h **** // Module 0..31
+ 546:../system/include/DEVICE/partition_TC8234.h **** //   <o.17>  CRC       <0=> Secure <1=> Non-Secure
+ 547:../system/include/DEVICE/partition_TC8234.h **** //   <o.18>  CRPT   <0=> Secure <1=> Non-Secure
+ 548:../system/include/DEVICE/partition_TC8234.h **** */
+ 549:../system/include/DEVICE/partition_TC8234.h **** #define SCU_INIT_PNSSET1_VAL      0x00000000
+ 550:../system/include/DEVICE/partition_TC8234.h **** /*
+ 551:../system/include/DEVICE/partition_TC8234.h ****     PNSSET2
+ 552:../system/include/DEVICE/partition_TC8234.h **** */
+ 553:../system/include/DEVICE/partition_TC8234.h **** /*
+ 554:../system/include/DEVICE/partition_TC8234.h **** // Module 0..31
+ 555:../system/include/DEVICE/partition_TC8234.h **** //   <o.1>  RTC       <0=> Secure <1=> Non-Secure
+ 556:../system/include/DEVICE/partition_TC8234.h **** //   <o.3>  EADC   <0=> Secure <1=> Non-Secure
+ 557:../system/include/DEVICE/partition_TC8234.h **** //   <o.5>  ACMP0      <0=> Secure <1=> Non-Secure
+ 558:../system/include/DEVICE/partition_TC8234.h **** //   <o.6>  OPA    <0=> Secure <1=> Non-Secure
+ 559:../system/include/DEVICE/partition_TC8234.h **** //   <o.7>  DAC      <0=> Secure <1=> Non-Secure
+ 560:../system/include/DEVICE/partition_TC8234.h **** //   <o.8>  I2S0      <0=> Secure <1=> Non-Secure
+ 561:../system/include/DEVICE/partition_TC8234.h **** //   <o.13>  OTG      <0=> Secure <1=> Non-Secure
+ 562:../system/include/DEVICE/partition_TC8234.h **** //   <o.17>  TMR23      <0=> Secure <1=> Non-Secure
+ 563:../system/include/DEVICE/partition_TC8234.h **** //   <o.24>  PWM0      <0=> Secure <1=> Non-Secure
+ 564:../system/include/DEVICE/partition_TC8234.h **** //   <o.25>  PWM1      <0=> Secure <1=> Non-Secure
+ 565:../system/include/DEVICE/partition_TC8234.h **** //   <o.26>  BPWM0      <0=> Secure <1=> Non-Secure
+ 566:../system/include/DEVICE/partition_TC8234.h **** //   <o.27>  BPWM1      <0=> Secure <1=> Non-Secure
+ 567:../system/include/DEVICE/partition_TC8234.h **** */
+ 568:../system/include/DEVICE/partition_TC8234.h **** #define SCU_INIT_PNSSET2_VAL      0x00000000
+ 569:../system/include/DEVICE/partition_TC8234.h **** /*
+ 570:../system/include/DEVICE/partition_TC8234.h ****     PNSSET3
+ 571:../system/include/DEVICE/partition_TC8234.h **** */
+ 572:../system/include/DEVICE/partition_TC8234.h **** /*
+ 573:../system/include/DEVICE/partition_TC8234.h **** // Module 0..31
+ 574:../system/include/DEVICE/partition_TC8234.h **** //   <o.0>  SPI0       <0=> Secure <1=> Non-Secure
+ 575:../system/include/DEVICE/partition_TC8234.h **** //   <o.1>  SPI1   <0=> Secure <1=> Non-Secure
+ 576:../system/include/DEVICE/partition_TC8234.h **** //   <o.2>  SPI2      <0=> Secure <1=> Non-Secure
+ 577:../system/include/DEVICE/partition_TC8234.h **** //   <o.3>  SPI3    <0=> Secure <1=> Non-Secure
+ 578:../system/include/DEVICE/partition_TC8234.h **** //   <o.4>  SPI4      <0=> Secure <1=> Non-Secure
+ 579:../system/include/DEVICE/partition_TC8234.h **** //   <o.5>  SPI5      <0=> Secure <1=> Non-Secure
+ 580:../system/include/DEVICE/partition_TC8234.h **** //   <o.16>  UART0      <0=> Secure <1=> Non-Secure
+ 581:../system/include/DEVICE/partition_TC8234.h **** //   <o.17>  UART1      <0=> Secure <1=> Non-Secure
+ 582:../system/include/DEVICE/partition_TC8234.h **** //   <o.18>  UART2      <0=> Secure <1=> Non-Secure
+ 583:../system/include/DEVICE/partition_TC8234.h **** //   <o.19>  UART3      <0=> Secure <1=> Non-Secure
+ 584:../system/include/DEVICE/partition_TC8234.h **** //   <o.20>  UART4      <0=> Secure <1=> Non-Secure
+ 585:../system/include/DEVICE/partition_TC8234.h **** //   <o.21>  UART5      <0=> Secure <1=> Non-Secure
+ 586:../system/include/DEVICE/partition_TC8234.h **** */
+ 587:../system/include/DEVICE/partition_TC8234.h **** #define SCU_INIT_PNSSET3_VAL      0x00010000
+ 588:../system/include/DEVICE/partition_TC8234.h **** /*
+ 589:../system/include/DEVICE/partition_TC8234.h ****     PNSSET4
+ 590:../system/include/DEVICE/partition_TC8234.h **** */
+ 591:../system/include/DEVICE/partition_TC8234.h **** /*
+ 592:../system/include/DEVICE/partition_TC8234.h **** // Module 0..31
+ 593:../system/include/DEVICE/partition_TC8234.h **** //   <o.0>  I2C0       <0=> Secure <1=> Non-Secure
+ 594:../system/include/DEVICE/partition_TC8234.h **** //   <o.1>  I2C1   <0=> Secure <1=> Non-Secure
+ 595:../system/include/DEVICE/partition_TC8234.h **** //   <o.2>  I2C2      <0=> Secure <1=> Non-Secure
+ 596:../system/include/DEVICE/partition_TC8234.h **** //   <o.16>  SC0      <0=> Secure <1=> Non-Secure
+ 597:../system/include/DEVICE/partition_TC8234.h **** //   <o.17>  SC1      <0=> Secure <1=> Non-Secure
+ 598:../system/include/DEVICE/partition_TC8234.h **** //   <o.18>  SC2      <0=> Secure <1=> Non-Secure
+ 599:../system/include/DEVICE/partition_TC8234.h **** */
+ 600:../system/include/DEVICE/partition_TC8234.h **** #define SCU_INIT_PNSSET4_VAL      0x00000000
+ 601:../system/include/DEVICE/partition_TC8234.h **** /*
+ 602:../system/include/DEVICE/partition_TC8234.h ****     PNSSET5
+ 603:../system/include/DEVICE/partition_TC8234.h **** */
+ 604:../system/include/DEVICE/partition_TC8234.h **** /*
+ 605:../system/include/DEVICE/partition_TC8234.h **** // Module 0..31
+ 606:../system/include/DEVICE/partition_TC8234.h **** //   <o.0>  CAN0       <0=> Secure <1=> Non-Secure
+ 607:../system/include/DEVICE/partition_TC8234.h **** //   <o.16>  QEI0   <0=> Secure <1=> Non-Secure
+ 608:../system/include/DEVICE/partition_TC8234.h **** //   <o.17>  QEI1      <0=> Secure <1=> Non-Secure
+ 609:../system/include/DEVICE/partition_TC8234.h **** //   <o.20>  ECAP0    <0=> Secure <1=> Non-Secure
+ 610:../system/include/DEVICE/partition_TC8234.h **** //   <o.21>  ECAP1      <0=> Secure <1=> Non-Secure
+ 611:../system/include/DEVICE/partition_TC8234.h **** //   <o.23>  DSRC    <0=> Secure <1=> Non-Secure
+ 612:../system/include/DEVICE/partition_TC8234.h **** //   <o.24>  LCD      <0=> Secure <1=> Non-Secure
+ 613:../system/include/DEVICE/partition_TC8234.h **** //   <o.25>  TRNG    <0=> Secure <1=> Non-Secure
+ 614:../system/include/DEVICE/partition_TC8234.h **** */
+ 615:../system/include/DEVICE/partition_TC8234.h **** #define SCU_INIT_PNSSET5_VAL      0x00000000
+ 616:../system/include/DEVICE/partition_TC8234.h **** /*
+ 617:../system/include/DEVICE/partition_TC8234.h ****     PNSSET6
+ 618:../system/include/DEVICE/partition_TC8234.h **** */
+ 619:../system/include/DEVICE/partition_TC8234.h **** /*
+ 620:../system/include/DEVICE/partition_TC8234.h **** // Module 0..31
+ 621:../system/include/DEVICE/partition_TC8234.h **** //   <o.0>  USBD       <0=> Secure <1=> Non-Secure
+ 622:../system/include/DEVICE/partition_TC8234.h **** //   <o.16>  USCI0   <0=> Secure <1=> Non-Secure
+ 623:../system/include/DEVICE/partition_TC8234.h **** //   <o.17>  USCI1      <0=> Secure <1=> Non-Secure
+ 624:../system/include/DEVICE/partition_TC8234.h **** */
+ 625:../system/include/DEVICE/partition_TC8234.h **** #define SCU_INIT_PNSSET6_VAL      0x00000000
+ 626:../system/include/DEVICE/partition_TC8234.h **** /*
+ 627:../system/include/DEVICE/partition_TC8234.h **** // </h>
+ 628:../system/include/DEVICE/partition_TC8234.h **** */
+ 629:../system/include/DEVICE/partition_TC8234.h **** 
+ 630:../system/include/DEVICE/partition_TC8234.h **** 
+ 631:../system/include/DEVICE/partition_TC8234.h **** 
+ 632:../system/include/DEVICE/partition_TC8234.h **** /*
+ 633:../system/include/DEVICE/partition_TC8234.h **** // <h> GPIO Secure Attribution Configuration
+ 634:../system/include/DEVICE/partition_TC8234.h **** */
+ 635:../system/include/DEVICE/partition_TC8234.h **** 
+ 636:../system/include/DEVICE/partition_TC8234.h **** /*
+ 637:../system/include/DEVICE/partition_TC8234.h ****     IONSSET
+ 638:../system/include/DEVICE/partition_TC8234.h **** */
+ 639:../system/include/DEVICE/partition_TC8234.h **** /*
+ 640:../system/include/DEVICE/partition_TC8234.h **** // Bit 0..31
+ 641:../system/include/DEVICE/partition_TC8234.h **** //   <o.0>  PA       <0=> Secure <1=> Non-Secure
+ 642:../system/include/DEVICE/partition_TC8234.h **** //   <o.1>  PB   <0=> Secure <1=> Non-Secure
+ 643:../system/include/DEVICE/partition_TC8234.h **** //   <o.2>  PC      <0=> Secure <1=> Non-Secure
+ 644:../system/include/DEVICE/partition_TC8234.h **** //   <o.3>  PD    <0=> Secure <1=> Non-Secure
+ 645:../system/include/DEVICE/partition_TC8234.h **** //   <o.4>  PE      <0=> Secure <1=> Non-Secure
+ 646:../system/include/DEVICE/partition_TC8234.h **** //   <o.5>  PF      <0=> Secure <1=> Non-Secure
+ 647:../system/include/DEVICE/partition_TC8234.h **** //   <o.6>  PG      <0=> Secure <1=> Non-Secure
+ 648:../system/include/DEVICE/partition_TC8234.h **** */
+ 649:../system/include/DEVICE/partition_TC8234.h **** #define SCU_INIT_IONSSET_VAL      0x00000000
+ 650:../system/include/DEVICE/partition_TC8234.h **** /*
+ 651:../system/include/DEVICE/partition_TC8234.h **** // </h>
+ 652:../system/include/DEVICE/partition_TC8234.h **** */
+ 653:../system/include/DEVICE/partition_TC8234.h **** 
+ 654:../system/include/DEVICE/partition_TC8234.h **** 
+ 655:../system/include/DEVICE/partition_TC8234.h **** /*
+ 656:../system/include/DEVICE/partition_TC8234.h **** // <h> SRAM Secure Attribution Configuration
+ 657:../system/include/DEVICE/partition_TC8234.h **** */
+ 658:../system/include/DEVICE/partition_TC8234.h **** 
+ 659:../system/include/DEVICE/partition_TC8234.h **** /*
+ 660:../system/include/DEVICE/partition_TC8234.h ****     SRAMNSSET
+ 661:../system/include/DEVICE/partition_TC8234.h **** */
+ 662:../system/include/DEVICE/partition_TC8234.h **** /*
+ 663:../system/include/DEVICE/partition_TC8234.h **** // Bit 0..31
+ 664:../system/include/DEVICE/partition_TC8234.h **** //   <o.0>  0x00000000 ~ 0x00001FFF        <0=> Secure <1=> Non-Secure
+ 665:../system/include/DEVICE/partition_TC8234.h **** //   <o.1>  0x00002000 ~ 0x00003FFF   <0=> Secure <1=> Non-Secure
+ 666:../system/include/DEVICE/partition_TC8234.h **** //   <o.2>  0x00004000 ~ 0x00005FFF      <0=> Secure <1=> Non-Secure
+ 667:../system/include/DEVICE/partition_TC8234.h **** //   <o.3>  0x00006000 ~ 0x00007FFF    <0=> Secure <1=> Non-Secure
+ 668:../system/include/DEVICE/partition_TC8234.h **** //   <o.4>  0x00008000 ~ 0x00009FFF      <0=> Secure <1=> Non-Secure
+ 669:../system/include/DEVICE/partition_TC8234.h **** //   <o.5>  0x0000A000 ~ 0x0000BFFF      <0=> Secure <1=> Non-Secure
+ 670:../system/include/DEVICE/partition_TC8234.h **** //   <o.6>  0x0000C000 ~ 0x0000DFFF      <0=> Secure <1=> Non-Secure
+ 671:../system/include/DEVICE/partition_TC8234.h **** //   <o.7>  0x0000E000 ~ 0x0000FFFF       <0=> Secure <1=> Non-Secure
+ 672:../system/include/DEVICE/partition_TC8234.h **** //   <o.8>  0x00010000 ~ 0x00011FFF   <0=> Secure <1=> Non-Secure
+ 673:../system/include/DEVICE/partition_TC8234.h **** //   <o.9>  0x00012000 ~ 0x00013FFF      <0=> Secure <1=> Non-Secure
+ 674:../system/include/DEVICE/partition_TC8234.h **** //   <o.10> 0x00014000 ~ 0x00015FFF    <0=> Secure <1=> Non-Secure
+ 675:../system/include/DEVICE/partition_TC8234.h **** //   <o.11> 0x00016000 ~ 0x00017FFF      <0=> Secure <1=> Non-Secure
+ 676:../system/include/DEVICE/partition_TC8234.h **** //   <o.12> 0x00018000 ~ 0x00019FFF      <0=> Secure <1=> Non-Secure
+ 677:../system/include/DEVICE/partition_TC8234.h **** //   <o.13> 0x0001A000 ~ 0x0001BFFF      <0=> Secure <1=> Non-Secure
+ 678:../system/include/DEVICE/partition_TC8234.h **** //   <o.14> 0x0001C000 ~ 0x0001DFFF      <0=> Secure <1=> Non-Secure
+ 679:../system/include/DEVICE/partition_TC8234.h **** //   <o.15> 0x0001E000 ~ 0x0001FFFF      <0=> Secure <1=> Non-Secure
+ 680:../system/include/DEVICE/partition_TC8234.h **** */
+ 681:../system/include/DEVICE/partition_TC8234.h **** #define SCU_INIT_SRAMNSSET_VAL      0x0000FF00
+ 682:../system/include/DEVICE/partition_TC8234.h **** 
+ 683:../system/include/DEVICE/partition_TC8234.h **** /*
+ 684:../system/include/DEVICE/partition_TC8234.h **** // </h>
+ 685:../system/include/DEVICE/partition_TC8234.h **** */
+ 686:../system/include/DEVICE/partition_TC8234.h **** 
+ 687:../system/include/DEVICE/partition_TC8234.h **** 
+ 688:../system/include/DEVICE/partition_TC8234.h **** 
+ 689:../system/include/DEVICE/partition_TC8234.h **** 
+ 690:../system/include/DEVICE/partition_TC8234.h **** 
+ 691:../system/include/DEVICE/partition_TC8234.h **** 
+ 692:../system/include/DEVICE/partition_TC8234.h **** /**
+ 693:../system/include/DEVICE/partition_TC8234.h ****   \brief   Setup SCU Configuration Unit
+ 694:../system/include/DEVICE/partition_TC8234.h ****   \details
+ 695:../system/include/DEVICE/partition_TC8234.h **** 
+ 696:../system/include/DEVICE/partition_TC8234.h ****  */
+ 697:../system/include/DEVICE/partition_TC8234.h **** __STATIC_INLINE void SCU_Setup(void)
+ 698:../system/include/DEVICE/partition_TC8234.h **** {
+ 170              		.loc 1 698 0
+ 171              		.cfi_startproc
+ 172              		@ args = 0, pretend = 0, frame = 0
+ 173              		@ frame_needed = 1, uses_anonymous_args = 0
+ 174 0000 80B5     		push	{r7, lr}
+ 175              	.LCFI2:
+ 176              		.cfi_def_cfa_offset 8
+ 177              		.cfi_offset 7, -8
+ 178              		.cfi_offset 14, -4
+ 179 0002 00AF     		add	r7, sp, #0
+ 180              	.LCFI3:
+ 181              		.cfi_def_cfa_register 7
+ 699:../system/include/DEVICE/partition_TC8234.h ****     SCU->PNSSET[0] = SCU_INIT_PNSSET0_VAL;
+ 182              		.loc 1 699 0
+ 183 0004 0F4B     		ldr	r3, .L5
+ 184 0006 0122     		movs	r2, #1
+ 185 0008 1A60     		str	r2, [r3]
+ 700:../system/include/DEVICE/partition_TC8234.h ****     SCU->PNSSET[1] = SCU_INIT_PNSSET1_VAL;
+ 186              		.loc 1 700 0
+ 187 000a 0E4B     		ldr	r3, .L5
+ 188 000c 0022     		movs	r2, #0
+ 189 000e 5A60     		str	r2, [r3, #4]
+ 701:../system/include/DEVICE/partition_TC8234.h ****     SCU->PNSSET[2] = SCU_INIT_PNSSET2_VAL;
+ 190              		.loc 1 701 0
+ 191 0010 0C4B     		ldr	r3, .L5
+ 192 0012 0022     		movs	r2, #0
+ 193 0014 9A60     		str	r2, [r3, #8]
+ 702:../system/include/DEVICE/partition_TC8234.h ****     SCU->PNSSET[3] = SCU_INIT_PNSSET3_VAL;
+ 194              		.loc 1 702 0
+ 195 0016 0B4B     		ldr	r3, .L5
+ 196 0018 8022     		movs	r2, #128
+ 197 001a 5202     		lsls	r2, r2, #9
+ 198 001c DA60     		str	r2, [r3, #12]
+ 703:../system/include/DEVICE/partition_TC8234.h ****     SCU->PNSSET[4] = SCU_INIT_PNSSET4_VAL;
+ 199              		.loc 1 703 0
+ 200 001e 094B     		ldr	r3, .L5
+ 201 0020 0022     		movs	r2, #0
+ 202 0022 1A61     		str	r2, [r3, #16]
+ 704:../system/include/DEVICE/partition_TC8234.h ****     SCU->PNSSET[5] = SCU_INIT_PNSSET5_VAL;
+ 203              		.loc 1 704 0
+ 204 0024 074B     		ldr	r3, .L5
+ 205 0026 0022     		movs	r2, #0
+ 206 0028 5A61     		str	r2, [r3, #20]
+ 705:../system/include/DEVICE/partition_TC8234.h ****     SCU->PNSSET[6] = SCU_INIT_PNSSET6_VAL;
+ 207              		.loc 1 705 0
+ 208 002a 064B     		ldr	r3, .L5
+ 209 002c 0022     		movs	r2, #0
+ 210 002e 9A61     		str	r2, [r3, #24]
+ 706:../system/include/DEVICE/partition_TC8234.h **** 
+ 707:../system/include/DEVICE/partition_TC8234.h ****     SCU->IONSSET = SCU_INIT_IONSSET_VAL;
+ 211              		.loc 1 707 0
+ 212 0030 044B     		ldr	r3, .L5
+ 213 0032 0022     		movs	r2, #0
+ 214 0034 1A62     		str	r2, [r3, #32]
+ 708:../system/include/DEVICE/partition_TC8234.h ****     SCU->SRAMNSSET = SCU_INIT_SRAMNSSET_VAL;
+ 215              		.loc 1 708 0
+ 216 0036 034B     		ldr	r3, .L5
+ 217 0038 4FF60072 		movw	r2, #65280
+ 218 003c 5A62     		str	r2, [r3, #36]
+ 709:../system/include/DEVICE/partition_TC8234.h **** 
+ 710:../system/include/DEVICE/partition_TC8234.h **** 
+ 711:../system/include/DEVICE/partition_TC8234.h **** }
+ 219              		.loc 1 711 0
+ 220 003e C046     		nop
+ 221 0040 BD46     		mov	sp, r7
+ 222              		@ sp needed
+ 223 0042 80BD     		pop	{r7, pc}
+ 224              	.L6:
+ 225              		.align	2
+ 226              	.L5:
+ 227 0044 00F00240 		.word	1073934336
+ 228              		.cfi_endproc
+ 229              	.LFE89:
+ 231              		.global	SystemCoreClock
+ 232              		.section	.data.SystemCoreClock,"aw",%progbits
+ 233              		.align	2
+ 236              	SystemCoreClock:
+ 237 0000 001BB700 		.word	12000000
+ 238              		.global	CyclesPerUs
+ 239              		.section	.data.CyclesPerUs,"aw",%progbits
+ 240              		.align	2
+ 243              	CyclesPerUs:
+ 244 0000 0C000000 		.word	12
+ 245              		.global	PllClock
+ 246              		.section	.data.PllClock,"aw",%progbits
+ 247              		.align	2
+ 250              	PllClock:
+ 251 0000 001BB700 		.word	12000000
+ 252              		.global	gau32ClkSrcTbl
+ 253              		.section	.rodata.gau32ClkSrcTbl,"a",%progbits
+ 254              		.align	2
+ 257              	gau32ClkSrcTbl:
+ 258 0000 001BB700 		.word	12000000
+ 259 0004 00800000 		.word	32768
+ 260 0008 00000000 		.word	0
+ 261 000c 10270000 		.word	10000
+ 262 0010 00000000 		.word	0
+ 263 0014 00000000 		.word	0
+ 264 0018 006CDC02 		.word	48000000
+ 265 001c 001BB700 		.word	12000000
+ 266              		.section	.text.SystemCoreClockUpdate,"ax",%progbits
+ 267              		.align	1
+ 268              		.global	SystemCoreClockUpdate
+ 269              		.syntax unified
+ 270              		.code	16
+ 271              		.thumb_func
+ 272              		.fpu softvfp
+ 274              	SystemCoreClockUpdate:
+ 275              	.LFB90:
+ 276              		.file 2 "../system/src/system_TC8234.c"
+   1:../system/src/system_TC8234.c **** /**************************************************************************//**
+   2:../system/src/system_TC8234.c ****  * @file     system_TC8234.c
+   3:../system/src/system_TC8234.c ****  * @version  V2.00
+   4:../system/src/system_TC8234.c ****  * $Revision: 4 $
+   5:../system/src/system_TC8234.c ****  * $Date: 16/08/15 10:33a $
+   6:../system/src/system_TC8234.c ****  * @brief    System Setting Source File
+   7:../system/src/system_TC8234.c ****  *
+   8:../system/src/system_TC8234.c ****  * @note
+   9:../system/src/system_TC8234.c ****  * Copyright (C) 2016 Nuvoton Technology Corp. All rights reserved.
+  10:../system/src/system_TC8234.c ****  *
+  11:../system/src/system_TC8234.c ****  ******************************************************************************/
+  12:../system/src/system_TC8234.c **** #include <stdio.h>
+  13:../system/src/system_TC8234.c **** #include <stdint.h>
+  14:../system/src/system_TC8234.c **** #include "TC8234.h"
+  15:../system/src/system_TC8234.c **** 
+  16:../system/src/system_TC8234.c **** #if defined (__ARM_FEATURE_CMSE) &&  (__ARM_FEATURE_CMSE == 3U)
+  17:../system/src/system_TC8234.c ****   #include "partition_TC8234.h"
+  18:../system/src/system_TC8234.c **** #endif
+  19:../system/src/system_TC8234.c **** 
+  20:../system/src/system_TC8234.c **** 
+  21:../system/src/system_TC8234.c **** extern void *g_pfnVectors;                   /* see startup file */
+  22:../system/src/system_TC8234.c **** 
+  23:../system/src/system_TC8234.c **** /*----------------------------------------------------------------------------
+  24:../system/src/system_TC8234.c ****   Clock Variable definitions
+  25:../system/src/system_TC8234.c ****  *----------------------------------------------------------------------------*/
+  26:../system/src/system_TC8234.c **** uint32_t SystemCoreClock  = __HXT;              /*!< System Clock Frequency (Core Clock) */
+  27:../system/src/system_TC8234.c **** uint32_t CyclesPerUs      = (__HXT / 1000000);  /*!< Cycles per micro second             */
+  28:../system/src/system_TC8234.c **** uint32_t PllClock         = __HXT;              /*!< PLL Output Clock Frequency          */
+  29:../system/src/system_TC8234.c **** const uint32_t gau32ClkSrcTbl[] = {__HXT, __LXT, 0, __LIRC, 0, 0, __HIRC48, __HIRC};
+  30:../system/src/system_TC8234.c **** 
+  31:../system/src/system_TC8234.c **** 
+  32:../system/src/system_TC8234.c **** /**
+  33:../system/src/system_TC8234.c ****  * @brief    Update the Variable SystemCoreClock
+  34:../system/src/system_TC8234.c ****  *
+  35:../system/src/system_TC8234.c ****  * @param    None
+  36:../system/src/system_TC8234.c ****  *
+  37:../system/src/system_TC8234.c ****  * @return   None
+  38:../system/src/system_TC8234.c ****  *
+  39:../system/src/system_TC8234.c ****  * @details  This function is used to update the variable SystemCoreClock
+  40:../system/src/system_TC8234.c ****  *           and must be called whenever the core clock is changed.
+  41:../system/src/system_TC8234.c ****  */
+  42:../system/src/system_TC8234.c **** void SystemCoreClockUpdate(void)
+  43:../system/src/system_TC8234.c **** {
+ 277              		.loc 2 43 0
+ 278              		.cfi_startproc
+ 279              		@ args = 0, pretend = 0, frame = 0
+ 280              		@ frame_needed = 1, uses_anonymous_args = 0
+ 281 0000 80B5     		push	{r7, lr}
+ 282              	.LCFI4:
+ 283              		.cfi_def_cfa_offset 8
+ 284              		.cfi_offset 7, -8
+ 285              		.cfi_offset 14, -4
+ 286 0002 00AF     		add	r7, sp, #0
+ 287              	.LCFI5:
+ 288              		.cfi_def_cfa_register 7
+  44:../system/src/system_TC8234.c **** #if 0
+  45:../system/src/system_TC8234.c **** 	uint32_t u32Freq, u32ClkSrc;
+  46:../system/src/system_TC8234.c ****     uint32_t u32HclkDiv;
+  47:../system/src/system_TC8234.c **** 
+  48:../system/src/system_TC8234.c ****     u32ClkSrc = CLK->CLKSEL0 & CLK_CLKSEL0_HCLKSEL_Msk;
+  49:../system/src/system_TC8234.c **** 
+  50:../system/src/system_TC8234.c ****     /* Update PLL Clock */
+  51:../system/src/system_TC8234.c ****     PllClock = CLK_GetPLLClockFreq();
+  52:../system/src/system_TC8234.c **** 
+  53:../system/src/system_TC8234.c ****     if(u32ClkSrc != CLK_CLKSEL0_HCLKSEL_PLL)
+  54:../system/src/system_TC8234.c ****     {
+  55:../system/src/system_TC8234.c ****         /* Use the clock sources directly */
+  56:../system/src/system_TC8234.c ****         u32Freq = gau32ClkSrcTbl[u32ClkSrc];
+  57:../system/src/system_TC8234.c ****     }
+  58:../system/src/system_TC8234.c ****     else
+  59:../system/src/system_TC8234.c ****     {
+  60:../system/src/system_TC8234.c ****         /* Use PLL clock */
+  61:../system/src/system_TC8234.c ****         u32Freq = PllClock;
+  62:../system/src/system_TC8234.c ****     }
+  63:../system/src/system_TC8234.c **** 
+  64:../system/src/system_TC8234.c ****     u32HclkDiv = (CLK->CLKDIV0 & CLK_CLKDIV0_HCLKDIV_Msk) + 1;
+  65:../system/src/system_TC8234.c **** 
+  66:../system/src/system_TC8234.c ****     /* Update System Core Clock */
+  67:../system/src/system_TC8234.c ****     SystemCoreClock = u32Freq / u32HclkDiv;
+  68:../system/src/system_TC8234.c **** 
+  69:../system/src/system_TC8234.c ****     CyclesPerUs = (SystemCoreClock + 500000) / 1000000;
+  70:../system/src/system_TC8234.c **** #endif
+  71:../system/src/system_TC8234.c **** }
+ 289              		.loc 2 71 0
+ 290 0004 C046     		nop
+ 291 0006 BD46     		mov	sp, r7
+ 292              		@ sp needed
+ 293 0008 80BD     		pop	{r7, pc}
+ 294              		.cfi_endproc
+ 295              	.LFE90:
+ 297              		.section	.text.SystemInit,"ax",%progbits
+ 298              		.align	1
+ 299              		.global	SystemInit
+ 300              		.syntax unified
+ 301              		.code	16
+ 302              		.thumb_func
+ 303              		.fpu softvfp
+ 305              	SystemInit:
+ 306              	.LFB91:
+  72:../system/src/system_TC8234.c **** 
+  73:../system/src/system_TC8234.c **** 
+  74:../system/src/system_TC8234.c **** 
+  75:../system/src/system_TC8234.c **** /**
+  76:../system/src/system_TC8234.c ****  * @brief    System Initialization
+  77:../system/src/system_TC8234.c ****  *
+  78:../system/src/system_TC8234.c ****  * @param    None
+  79:../system/src/system_TC8234.c ****  *
+  80:../system/src/system_TC8234.c ****  * @return   None
+  81:../system/src/system_TC8234.c ****  *
+  82:../system/src/system_TC8234.c ****  * @details  The necessary initialization of system. Global variables are forbidden here.
+  83:../system/src/system_TC8234.c ****  */
+  84:../system/src/system_TC8234.c **** void SystemInit (void)
+  85:../system/src/system_TC8234.c **** {
+ 307              		.loc 2 85 0
+ 308              		.cfi_startproc
+ 309              		@ args = 0, pretend = 0, frame = 0
+ 310              		@ frame_needed = 1, uses_anonymous_args = 0
+ 311 0000 80B5     		push	{r7, lr}
+ 312              	.LCFI6:
+ 313              		.cfi_def_cfa_offset 8
+ 314              		.cfi_offset 7, -8
+ 315              		.cfi_offset 14, -4
+ 316 0002 00AF     		add	r7, sp, #0
+ 317              	.LCFI7:
+ 318              		.cfi_def_cfa_register 7
+  86:../system/src/system_TC8234.c **** #if defined (__VTOR_PRESENT) && (__VTOR_PRESENT == 1U)
+  87:../system/src/system_TC8234.c **** 	SCB->VTOR = (uint32_t) &g_pfnVectors;
+ 319              		.loc 2 87 0
+ 320 0004 044B     		ldr	r3, .L9
+ 321 0006 054A     		ldr	r2, .L9+4
+ 322 0008 9A60     		str	r2, [r3, #8]
+  88:../system/src/system_TC8234.c **** #endif
+  89:../system/src/system_TC8234.c **** 
+  90:../system/src/system_TC8234.c **** #if defined (__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U)
+  91:../system/src/system_TC8234.c ****   TZ_SAU_Setup();
+ 323              		.loc 2 91 0
+ 324 000a FFF7FEFF 		bl	TZ_SAU_Setup
+  92:../system/src/system_TC8234.c ****   SCU_Setup();
+ 325              		.loc 2 92 0
+ 326 000e FFF7FEFF 		bl	SCU_Setup
+  93:../system/src/system_TC8234.c **** #endif
+  94:../system/src/system_TC8234.c **** 
+  95:../system/src/system_TC8234.c **** #ifdef INIT_SYSCLK_AT_BOOTING
+  96:../system/src/system_TC8234.c ****     
+  97:../system/src/system_TC8234.c **** #endif
+  98:../system/src/system_TC8234.c **** 	
+  99:../system/src/system_TC8234.c **** }
+ 327              		.loc 2 99 0
+ 328 0012 C046     		nop
+ 329 0014 BD46     		mov	sp, r7
+ 330              		@ sp needed
+ 331 0016 80BD     		pop	{r7, pc}
+ 332              	.L10:
+ 333              		.align	2
+ 334              	.L9:
+ 335 0018 00ED00E0 		.word	-536810240
+ 336 001c 00000000 		.word	g_pfnVectors
+ 337              		.cfi_endproc
+ 338              	.LFE91:
+ 340              		.text
+ 341              	.Letext0:
+ 342              		.file 3 "c:\\program files\\gnu tools arm embedded\\6.2 2016q4\\arm-none-eabi\\include\\machine\\_
+ 343              		.file 4 "c:\\program files\\gnu tools arm embedded\\6.2 2016q4\\arm-none-eabi\\include\\sys\\lock.
+ 344              		.file 5 "c:\\program files\\gnu tools arm embedded\\6.2 2016q4\\arm-none-eabi\\include\\sys\\_type
+ 345              		.file 6 "c:\\program files\\gnu tools arm embedded\\6.2 2016q4\\lib\\gcc\\arm-none-eabi\\6.2.1\\in
+ 346              		.file 7 "c:\\program files\\gnu tools arm embedded\\6.2 2016q4\\arm-none-eabi\\include\\sys\\reent
+ 347              		.file 8 "c:\\program files\\gnu tools arm embedded\\6.2 2016q4\\arm-none-eabi\\include\\sys\\_stdi
+ 348              		.file 9 "../system/include/cmsis/core_cm23.h"
+ 349              		.file 10 "../system/include/DEVICE/system_TC8234.h"
+ 350              		.file 11 "../system/include/DEVICE/TC8234.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 system_TC8234.c
+C:\Users\CCMA\AppData\Local\Temp\ccpkQWzy.s:16     .text.TZ_SAU_Setup:00000000 $t
+C:\Users\CCMA\AppData\Local\Temp\ccpkQWzy.s:22     .text.TZ_SAU_Setup:00000000 TZ_SAU_Setup
+C:\Users\CCMA\AppData\Local\Temp\ccpkQWzy.s:144    .text.TZ_SAU_Setup:000000bc $d
+C:\Users\CCMA\AppData\Local\Temp\ccpkQWzy.s:162    .text.SCU_Setup:00000000 $t
+C:\Users\CCMA\AppData\Local\Temp\ccpkQWzy.s:168    .text.SCU_Setup:00000000 SCU_Setup
+C:\Users\CCMA\AppData\Local\Temp\ccpkQWzy.s:227    .text.SCU_Setup:00000044 $d
+C:\Users\CCMA\AppData\Local\Temp\ccpkQWzy.s:236    .data.SystemCoreClock:00000000 SystemCoreClock
+C:\Users\CCMA\AppData\Local\Temp\ccpkQWzy.s:233    .data.SystemCoreClock:00000000 $d
+C:\Users\CCMA\AppData\Local\Temp\ccpkQWzy.s:243    .data.CyclesPerUs:00000000 CyclesPerUs
+C:\Users\CCMA\AppData\Local\Temp\ccpkQWzy.s:240    .data.CyclesPerUs:00000000 $d
+C:\Users\CCMA\AppData\Local\Temp\ccpkQWzy.s:250    .data.PllClock:00000000 PllClock
+C:\Users\CCMA\AppData\Local\Temp\ccpkQWzy.s:247    .data.PllClock:00000000 $d
+C:\Users\CCMA\AppData\Local\Temp\ccpkQWzy.s:257    .rodata.gau32ClkSrcTbl:00000000 gau32ClkSrcTbl
+C:\Users\CCMA\AppData\Local\Temp\ccpkQWzy.s:254    .rodata.gau32ClkSrcTbl:00000000 $d
+C:\Users\CCMA\AppData\Local\Temp\ccpkQWzy.s:267    .text.SystemCoreClockUpdate:00000000 $t
+C:\Users\CCMA\AppData\Local\Temp\ccpkQWzy.s:274    .text.SystemCoreClockUpdate:00000000 SystemCoreClockUpdate
+C:\Users\CCMA\AppData\Local\Temp\ccpkQWzy.s:298    .text.SystemInit:00000000 $t
+C:\Users\CCMA\AppData\Local\Temp\ccpkQWzy.s:305    .text.SystemInit:00000000 SystemInit
+C:\Users\CCMA\AppData\Local\Temp\ccpkQWzy.s:335    .text.SystemInit:00000018 $d
+                     .debug_frame:00000010 $d
+                           .group:00000000 wm4.0.087e176d0399834c705147ed10b7207a
+                           .group:00000000 wm4._newlib_version.h.4.ad342815780c8db09778091a421b5b5b
+                           .group:00000000 wm4.newlib.h.34.ade2dd58293cce3191e5024d8824a202
+                           .group:00000000 wm4.features.h.22.5cdadbb3efe495d1c9e38350b8c376c7
+                           .group:00000000 wm4.config.h.219.341816d1cc54601a0d2a3e284e3d034c
+                           .group:00000000 wm4._ansi.h.23.9f8fcfa20193763fcf364fb91705c94b
+                           .group:00000000 wm4.stdio.h.31.7c0e28c411445f3f9c5b11accf882760
+                           .group:00000000 wm4._default_types.h.6.959254cf5f09734ea7516c89e8bb21bd
+                           .group:00000000 wm4.stddef.h.187.2ff233552538c6ff9b8575ca8ea52cb3
+                           .group:00000000 wm4.cdefs.h.47.d472b786fad7f248e8524f569f3d5350
+                           .group:00000000 wm4.stddef.h.39.ec95e8feac892e292b69dc7ae75b0d64
+                           .group:00000000 wm4.stdarg.h.34.3a23a216c0c293b3d2ea2e89281481e6
+                           .group:00000000 wm4.lock.h.2.9bc98482741e5e2a9450b12934a684ea
+                           .group:00000000 wm4._types.h.125.5cf8a495f1f7ef36777ad868a1e32068
+                           .group:00000000 wm4.stddef.h.161.5349cb105733e8777bfb0cf53c4e3f34
+                           .group:00000000 wm4._types.h.183.c226d164ceca1f2ecb9ae9360c54a098
+                           .group:00000000 wm4.reent.h.17.5c31af1d4f47d2ada260e08fff34fcec
+                           .group:00000000 wm4.assert.h.11.db24e541f16414db224bf986d21017e2
+                           .group:00000000 wm4.reent.h.460.578a1080094974ec74f6c48bcf356980
+                           .group:00000000 wm4.types.h.40.e8c16e7ec36ba55f133d0616070e25fc
+                           .group:00000000 wm4._stdint.h.10.c24fa3af3bc1706662bb5593a907e841
+                           .group:00000000 wm4._endian.h.31.65a10590763c3dde1ac4a7f66d7d4891
+                           .group:00000000 wm4.endian.h.9.49f3a4695c1b61e8a0808de3c4a106cb
+                           .group:00000000 wm4._timeval.h.30.0e8bfd94e85db17dda3286ee81496fe6
+                           .group:00000000 wm4.timespec.h.41.d855182eb0e690443ab8651bcedca6e1
+                           .group:00000000 wm4.select.h.30.bbece7fa40993a78092dcc5805132560
+                           .group:00000000 wm4.types.h.69.ed3eae3cf73030a737515151ebcab7a1
+                           .group:00000000 wm4.stdio.h.2.4aa87247282eca6c8f36f9de33d8df1a
+                           .group:00000000 wm4.stdio.h.81.e75815e468af71def73c328e3aabfd80
+                           .group:00000000 wm4._intsup.h.10.cce27fed8484c08a33f522034c30d2b5
+                           .group:00000000 wm4.stdint.h.23.d53047a68f4a85177f80b422d52785ed
+                           .group:00000000 wm4.TC8234.h.41.e8307e65782f050acdedaa1c99902eda
+                           .group:00000000 wm4.core_cm23.h.32.a9d816557513dcc45f61a5743050ed37
+                           .group:00000000 wm4.cmsis_gcc.h.26.41038879cf168e2c536d47f29b7e8dd8
+                           .group:00000000 wm4.core_cm23.h.125.ba48219c7506089842d5c01f4f336b70
+                           .group:00000000 wm4.system_TC8234.h.13.5aa1165126f7ad438a96056b8f9767cd
+                           .group:00000000 wm4.TC8234.h.489.097065e3a879549c91dbff33e7fde3c1
+                           .group:00000000 wm4.sys.h.13.e2db55f2643ef5a4b9e5848a3c47eacf
+                           .group:00000000 wm4.clk.h.13.344c384269bede121fbfa7337007cf2d
+                           .group:00000000 wm4.uart.h.12.31952ad1e577cb5eb9dad9ec3ec13b6a
+                           .group:00000000 wm4.partition_TC8234.h.14.d4fb8219837fd042892dd5bfa294e296
+
+UNDEFINED SYMBOLS
+g_pfnVectors

@@ -1,0 +1,233 @@
+   1              	# 1 "../system/src/startup.S"
+   1              	
+   0              	
+   0              	
+   0              	
+   2              	    
+   3              	  .syntax unified
+   4              	  .thumb
+   5              	
+   6              	.global  g_pfnVectors
+   7              	.global  Default_Handler
+   8              	
+   9              	/* start address for the initialization values of the .data section. 
+  10              	defined in linker script */
+  11 0000 00000000 	.word  _sidata
+  12              	/* start address for the .data section. defined in linker script */  
+  13 0004 00000000 	.word  _sdata
+  14              	/* end address for the .data section. defined in linker script */
+  15 0008 00000000 	.word  _edata
+  16              	/* start address for the .bss section. defined in linker script */
+  17 000c 00000000 	.word  _sbss
+  18              	/* end address for the .bss section. defined in linker script */
+  19 0010 00000000 	.word  _ebss
+  20              	/* stack used for SystemInit_ExtMemCtl; always internal RAM used */
+  21              	
+  22              	/**
+  23              	 * @brief  This is the code that gets called when the processor first
+  24              	 *          starts execution following a reset event. Only the absolutely
+  25              	 *          necessary set is performed, after which the application
+  26              	 *          supplied main() routine is called. 
+  27              	 * @param  None
+  28              	 * @retval : None
+  29              	*/
+  30              	
+  31              		.section .stack
+  32              		.align	3
+  33              	#ifdef __STACK_SIZE
+  34              		.equ	Stack_Size, __STACK_SIZE
+  35              	#else
+  36              		.equ	Stack_Size, 0xc00
+  37              	#endif
+  38              		.globl	__StackTop
+  39              		.globl	__StackLimit
+  40              	__StackLimit:
+  41 0000 00000000 		.space	Stack_Size
+  41      00000000 
+  41      00000000 
+  41      00000000 
+  41      00000000 
+  43              	__StackTop:
+  45              	
+  46              		.section .heap
+  47              		.align	3
+  48              		.equ	Heap_Size, 0xc00
+  49              		.globl	__HeapBase
+  50              		.globl	__HeapLimit
+  51              	__HeapBase:
+  52              		.if	Heap_Size
+  53 0000 00000000 		.space	Heap_Size
+  53      00000000 
+  53      00000000 
+  53      00000000 
+  53      00000000 
+  54              		.endif
+  56              	__HeapLimit:
+  58              	
+  59              	
+  60              	
+  61              	    .section  .text.Reset_Handler
+  62              	  .weak  Reset_Handler
+  64              	Reset_Handler:  
+  65              	
+  66              	/*  Single section scheme.
+  67              	 *
+  68              	 *  The ranges of copy from/to are specified by following symbols
+  69              	 *    __etext: LMA of start of the section to copy from. Usually end of text
+  70              	 *    __data_start__: VMA of start of the section to copy to
+  71              	 *    __data_end__: VMA of end of the section to copy to
+  72              	 *
+  73              	 *  All addresses must be aligned to 4 bytes boundary.
+  74              	 */
+  75 0000 0A49     		ldr	r1, =_etext
+  76 0002 0B4A     		ldr	r2, =_sdata
+  77 0004 0B4B     		ldr	r3, =_edata
+  78              	
+  79 0006 9B1A     		subs	r3, r2
+  80 0008 03DD     		ble	.L_loop1_done
+  81              	
+  82              	.L_loop1:
+  83 000a 043B     		subs	r3, #4
+  84 000c C858     		ldr	r0, [r1,r3]
+  85 000e D050     		str	r0, [r2,r3]
+  86 0010 FBDC     		bgt	.L_loop1
+  87              	
+  88              	.L_loop1_done:
+  89              	
+  90              	/*  Single BSS section scheme.
+  91              	 *
+  92              	 *  The BSS section is specified by following symbols
+  93              	 *    __bss_start__: start of the BSS section.
+  94              	 *    __bss_end__: end of the BSS section.
+  95              	 *
+  96              	 *  Both addresses must be aligned to 4 bytes boundary.
+  97              	 */
+  98 0012 0949     		ldr	r1, =__bss_start__
+  99 0014 094A     		ldr	r2, =__bss_end__
+ 100              	
+ 101 0016 0020     		movs	r0, 0
+ 102              	
+ 103 0018 521A     		subs	r2, r1
+ 104 001a 02DD     		ble	.L_loop3_done
+ 105              	
+ 106              	.L_loop3:
+ 107 001c 043A     		subs	r2, #4
+ 108 001e 8850     		str	r0, [r1, r2]
+ 109 0020 FCDC     		bgt	.L_loop3
+ 110              	.L_loop3_done:
+ 111              	
+ 112 0022 FFF7FEFF 	  bl  SystemInit
+ 113              	
+ 114              	  /* Call static constructors */
+ 115              	  /* bl __libc_init_array */
+ 116              	
+ 117 0026 FFF7FEFF 	  bl  main
+ 118 002a 7047     	  bx  lr    
+ 120              	
+ 121              	/**
+ 122              	 * @brief  This is the code that gets called when the processor receives an 
+ 123              	 *         unexpected interrupt.  This simply enters an infinite loop, preserving
+ 124              	 *         the system state for examination by a debugger.
+ 125              	 * @param  None     
+ 126              	 * @retval None       
+ 127              	*/
+ 128              	    .section  .text.Default_Handler,"ax",%progbits
+ 129              	Default_Handler:
+ 130              	Infinite_Loop:
+ 131 0000 FEE7     	  b  Infinite_Loop
+ 133              	
+ 134              	   .section  .isr_vector,"a",%progbits
+ 135              	    .align 2
+ 138              	    
+ 139              	g_pfnVectors:
+ 140 0000 00000000 	  .word  _estack
+ 141 0004 00000000 	  .word  Reset_Handler
+ 142 0008 00000000 	  .word  NMI_Handler
+ 143 000c 00000000 	  .word  HardFault_Handler
+ 144 0010 00000000 	  .word  MemManage_Handler
+ 145 0014 00000000 	  .word  BusFault_Handler
+ 146 0018 00000000 	  .word  UsageFault_Handler
+ 147 001c 00000000 	  .word  0
+ 148 0020 00000000 	  .word  0
+ 149 0024 00000000 	  .word  0
+ 150 0028 00000000 	  .word  0
+ 151 002c 00000000 	  .word  SVC_Handler
+ 152 0030 00000000 	  .word  DebugMon_Handler
+ 153 0034 00000000 	  .word  0
+ 154 0038 00000000 	  .word  PendSV_Handler
+ 155 003c 00000000 	  .word  SysTick_Handler
+ 156              	             
+ 157              	                         
+ 158              	/*******************************************************************************
+ 159              	*
+ 160              	* Provide weak aliases for each Exception handler to the Default_Handler. 
+ 161              	* As they are weak aliases, any function with the same name will override 
+ 162              	* this definition.
+ 163              	* 
+ 164              	*******************************************************************************/
+ 165              	   .weak      NMI_Handler
+ 166              	   .thumb_set NMI_Handler,Default_Handler
+ 167              	  
+ 168              	   .weak      HardFault_Handler
+ 169              	   .thumb_set HardFault_Handler,Default_Handler
+ 170              	  
+ 171              	   .weak      MemManage_Handler
+ 172              	   .thumb_set MemManage_Handler,Default_Handler
+ 173              	  
+ 174              	   .weak      BusFault_Handler
+ 175              	   .thumb_set BusFault_Handler,Default_Handler
+ 176              	
+ 177              	   .weak      UsageFault_Handler
+ 178              	   .thumb_set UsageFault_Handler,Default_Handler
+ 179              	
+ 180              	   .weak      SVC_Handler
+ 181              	   .thumb_set SVC_Handler,Default_Handler
+ 182              	
+ 183              	   .weak      DebugMon_Handler
+ 184              	   .thumb_set DebugMon_Handler,Default_Handler
+ 185              	
+ 186              	   .weak      PendSV_Handler
+ 187              	   .thumb_set PendSV_Handler,Default_Handler
+ 188              	
+ 189              	   .weak      SysTick_Handler
+ 190              	   .thumb_set SysTick_Handler,Default_Handler              
+DEFINED SYMBOLS
+../system/src/startup.S:139    .isr_vector:00000000 g_pfnVectors
+../system/src/startup.S:129    .text.Default_Handler:00000000 Default_Handler
+../system/src/startup.S:32     .stack:00000000 $d
+../system/src/startup.S:36     *ABS*:00000c00 Stack_Size
+../system/src/startup.S:43     .stack:00000c00 __StackTop
+../system/src/startup.S:40     .stack:00000000 __StackLimit
+../system/src/startup.S:47     .heap:00000000 $d
+../system/src/startup.S:48     *ABS*:00000c00 Heap_Size
+../system/src/startup.S:51     .heap:00000000 __HeapBase
+../system/src/startup.S:56     .heap:00000c00 __HeapLimit
+../system/src/startup.S:64     .text.Reset_Handler:00000000 Reset_Handler
+../system/src/startup.S:75     .text.Reset_Handler:00000000 $t
+../system/src/startup.S:130    .text.Default_Handler:00000000 Infinite_Loop
+../system/src/startup.S:131    .text.Default_Handler:00000000 $t
+../system/src/startup.S:135    .isr_vector:00000000 $d
+../system/src/startup.S:129    .text.Default_Handler:00000000 NMI_Handler
+../system/src/startup.S:129    .text.Default_Handler:00000000 HardFault_Handler
+../system/src/startup.S:129    .text.Default_Handler:00000000 MemManage_Handler
+../system/src/startup.S:129    .text.Default_Handler:00000000 BusFault_Handler
+../system/src/startup.S:129    .text.Default_Handler:00000000 UsageFault_Handler
+../system/src/startup.S:129    .text.Default_Handler:00000000 SVC_Handler
+../system/src/startup.S:129    .text.Default_Handler:00000000 DebugMon_Handler
+../system/src/startup.S:129    .text.Default_Handler:00000000 PendSV_Handler
+../system/src/startup.S:129    .text.Default_Handler:00000000 SysTick_Handler
+../system/src/startup.S:190    .text.Reset_Handler:0000002c $d
+                            .text:00000000 $d
+
+UNDEFINED SYMBOLS
+_sidata
+_sdata
+_edata
+_sbss
+_ebss
+_etext
+__bss_start__
+__bss_end__
+SystemInit
+main
+_estack
